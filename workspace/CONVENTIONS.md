@@ -51,10 +51,29 @@ $msbuild = "C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Curren
 - UI tidak menulis SQL. Service tidak menyentuh kontrol. Repository tidak menampilkan `MessageBox`.
 - Error yang bisa ditampilkan ke pengguna ditangkap di UI; detail teknis tidak ditampilkan mentah-mentah.
 
+### 4.1 Alur Referensi (Vertical Slice)
+
+T-10 (login) dipakai sebagai contoh satu fitur utuh. Fitur lain mengikuti urutan lapisan yang sama.
+
+| Lapisan | Tanggung jawab | Contoh pada T-10 |
+| :--- | :--- | :--- |
+| UI (`LoginForm`) | Membaca input, memanggil service, menampilkan hasil atau pesan error | Event tombol login memanggil `AuthService` |
+| Service (`AuthService`) | Validasi input, hash SHA-256, cek user aktif | Mengembalikan hasil login atau pesan gagal |
+| Repository | Query parameterized ke database | `SELECT ... FROM users WHERE username = @username` |
+| Database | Menyimpan data | Tabel `users` (`password_hash`, `is_active`) |
+
+Aturan yang dicontohkan:
+
+- Alur satu arah: UI → Service → Repository. Jangan melompati lapisan.
+- UI tidak menulis SQL; service tidak menyentuh kontrol WinForms; repository tidak menampilkan `MessageBox`.
+- Semua nilai input masuk lewat parameter (`@username`), bukan konkatenasi string.
+- Koneksi, command, dan reader dibungkus `using`.
+- Pesan error untuk pengguna disiapkan di UI; detail teknis tidak ditampilkan mentah.
+
 ## 5. Aturan Database
 
 - Schema final ada di `database/schema_pos.sql`.
-- Perubahan schema wajib disetujui dan disinkronkan ke `docs/SPECIFICATION.md`.
+- Perubahan schema hanya oleh pemilik database dan wajib disinkronkan ke `database/schema_pos.sql`; dampak fitur dicatat di `docs/SPECIFICATION.md`.
 - Jangan menambah tabel/kolom tanpa fitur yang memakainya.
 - Operasi multi-tabel memakai `MySqlTransaction`.
 - Setiap perubahan stok wajib menulis `stock_movements` dalam transaksi yang sama.
@@ -64,7 +83,7 @@ $msbuild = "C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Curren
 
 - Laporan manajemen memakai FastReport; struk thermal memakai `PrintDocument`.
 - Template `.frx` adalah artefak sumber; jangan mengandalkan designer.
-- Nama tabel/kolom `DataTable` mengikuti `docs/SPECIFICATION.md` bagian 5.
+- Kontrak data laporan mengikuti `docs/SPECIFICATION.md` lampiran 11.2.
 - Format uang/tanggal dilakukan di C# sebelum masuk `DataTable`.
 - Jangan memakai alias dataset yang bentrok dengan namespace FastReport.
 - Uji PDF dengan data seed dan filter kosong.
@@ -73,7 +92,8 @@ $msbuild = "C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Curren
 
 | File / Folder | Owner utama | Perlu koordinasi |
 | :--- | :--- | :--- |
-| `src/OmniPos/Forms/` | Bagas | Ya, untuk `MainForm` |
+| `src/OmniPos/Forms/LoginForm*` | Moreno | Bagas |
+| `src/OmniPos/Forms/MainForm*`, `OnboardingWizardForm*` | Bagas | Moreno |
 | `src/OmniPos/Controls/UcMasterProduk*` | Rangga | — |
 | `src/OmniPos/Controls/UcKasir*` | Raymond | Agung untuk layout |
 | `src/OmniPos/Controls/UcInventaris*` | Moreno | — |
@@ -83,7 +103,8 @@ $msbuild = "C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Curren
 | `src/OmniPos/Services/TransactionService.cs` | Raymond | Bagas, Moreno |
 | `src/OmniPos/Services/InventoryService.cs` | Moreno | Raymond |
 | `src/OmniPos/Reports/` | Valencia | Moreno |
-| `src/OmniPos/Repositories/KoneksiDB.cs` | Bagas | — |
+| `src/OmniPos/Repositories/KoneksiDB.cs` | Moreno | Bagas |
+| `src/OmniPos/Services/AuthService.cs` | Moreno | Bagas |
 | `database/schema_pos.sql` | Moreno | Bagas |
 | `docs/SPECIFICATION.md` | Moreno | Semua owner modul |
 
@@ -91,7 +112,7 @@ $msbuild = "C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Curren
 
 - Update `workspace/TASKS.md` saat task selesai atau catatan blocker/dependency berubah.
 - Tulis blocker di kolom catatan, bukan hanya di chat.
-- Jika task low-impact tertinggal, pemilik modul terkait membantu bagian minimum agar demo tetap jalan.
+- Jika task pendukung tertinggal, pemilik modul terkait membantu bagian minimum agar demo tetap jalan.
 - Jika ada perubahan kontrak, catat di `docs/SPECIFICATION.md` dan `ctx/uas.md` sebelum coding.
 - Jangan mengandalkan ingatan; tulis keputusan di file.
 
