@@ -1,7 +1,8 @@
 using System;
+using System.Diagnostics;
 using System.Windows.Forms;
 using OmniPos.Forms;
-using OmniPos.Repositories;
+using OmniPos.Services;
 
 namespace OmniPos
 {
@@ -13,11 +14,17 @@ namespace OmniPos
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
-            string pesanKoneksi;
-            if (!KoneksiDB.TesKoneksi(out pesanKoneksi))
+            SistemService sistemService = new SistemService();
+            string detailKoneksi;
+
+            if (!sistemService.CekKoneksi(out detailKoneksi))
             {
-                MessageBox.Show(pesanKoneksi, "Koneksi Database",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                Debug.WriteLine("Cek koneksi gagal: " + detailKoneksi);
+                MessageBox.Show(
+                    "Tidak dapat terhubung ke database. Periksa server MySQL dan pengaturan App.config.",
+                    "Koneksi Database",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
                 return;
             }
 

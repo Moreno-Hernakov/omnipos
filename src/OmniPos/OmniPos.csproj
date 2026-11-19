@@ -55,6 +55,7 @@
     <Compile Include="Repositories\KoneksiDB.cs" />
     <Compile Include="Repositories\UserRepository.cs" />
     <Compile Include="Services\AuthService.cs" />
+    <Compile Include="Services\SistemService.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

@@ -1,3 +1,4 @@
+using System;
 using System.Configuration;
 using MySql.Data.MySqlClient;
 
@@ -23,21 +24,33 @@ namespace OmniPos.Repositories
             return new MySqlConnection(AmbilConnectionString());
         }
 
-        // Dipakai untuk mengecek database saat aplikasi mulai atau saat uji manual.
-        public static bool TesKoneksi(out string pesan)
+        // Mengembalikan status koneksi. Detail teknis hanya untuk log, bukan untuk pengguna.
+        public static bool TesKoneksi(out string detail)
         {
+            detail = "";
+
             try
             {
                 using (MySqlConnection koneksi = GetConnection())
                 {
                     koneksi.Open();
-                    pesan = "Koneksi berhasil. Versi server: " + koneksi.ServerVersion;
+                    detail = "Versi server: " + koneksi.ServerVersion;
                     return true;
                 }
             }
             catch (MySqlException ex)
             {
-                pesan = "Koneksi gagal: " + ex.Message;
+                detail = ex.Message;
+                return false;
+            }
+            catch (ConfigurationErrorsException ex)
+            {
+                detail = ex.Message;
+                return false;
+            }
+            catch (ArgumentException ex)
+            {
+                detail = ex.Message;
                 return false;
             }
         }

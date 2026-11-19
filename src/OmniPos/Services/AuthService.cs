@@ -1,5 +1,9 @@
+using System;
+using System.Configuration;
+using System.Diagnostics;
 using System.Security.Cryptography;
 using System.Text;
+using MySql.Data.MySqlClient;
 using OmniPos.Models;
 using OmniPos.Repositories;
 
@@ -28,7 +32,24 @@ namespace OmniPos.Services
                 return Gagal("Username dan password wajib diisi.");
             }
 
-            User pengguna = userRepository.CariBerdasarkanUsername(username.Trim());
+            User pengguna;
+
+            try
+            {
+                pengguna = userRepository.CariBerdasarkanUsername(username.Trim());
+            }
+            catch (MySqlException ex)
+            {
+                return GagalKoneksi(ex);
+            }
+            catch (ConfigurationErrorsException ex)
+            {
+                return GagalKoneksi(ex);
+            }
+            catch (ArgumentException ex)
+            {
+                return GagalKoneksi(ex);
+            }
 
             if (pengguna == null)
             {
@@ -77,6 +98,13 @@ namespace OmniPos.Services
             hasil.Pesan = pesan;
             hasil.Pengguna = null;
             return hasil;
+        }
+
+        // Detail teknis masuk log; pengguna hanya melihat pesan umum.
+        private HasilLogin GagalKoneksi(Exception ex)
+        {
+            Debug.WriteLine("Login gagal karena masalah database: " + ex.Message);
+            return Gagal("Tidak dapat terhubung ke database. Coba lagi atau hubungi administrator.");
         }
     }
 }
