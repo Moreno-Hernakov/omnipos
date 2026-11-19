@@ -10,7 +10,7 @@ Aturan khusus untuk folder `UAS_POS/`. Aturan global di `AGENTS.md` root workspa
 2. `UAS_POS/AGENTS.md` (file ini).
 3. `UAS_POS/workspace/README.md`.
 4. `UAS_POS/docs/SPECIFICATION.md`.
-5. `UAS_POS/workspace/TEAM.md` dan `workspace/TASKS.md`.
+5. `UAS_POS/workspace/TASKS.md`.
 6. `ctx/uas.md` untuk riwayat keputusan sesi sebelumnya.
 
 Jangan mulai menulis kode sebelum membaca spec dan task yang menjadi tanggung jawabmu.
@@ -21,10 +21,9 @@ Jangan mulai menulis kode sebelum membaca spec dan task yang menjadi tanggung ja
 
 | Topik | File |
 | :--- | :--- |
-| Arsitektur, kontrak data, kriteria penerimaan | `docs/SPECIFICATION.md` |
+| Perilaku fitur, alur kerja, kriteria penerimaan | `docs/SPECIFICATION.md` |
 | Skema database final | `database/schema_pos.sql` |
-| Pembagian tugas dan ownership | `workspace/TEAM.md` |
-| Status task | `workspace/TASKS.md` |
+| Pembagian tugas, ownership, dan status task | `workspace/TASKS.md` |
 | Aturan coding dan workflow | `workspace/CONVENTIONS.md` |
 | Riwayat keputusan lintas sesi | `ctx/uas.md` |
 | Proposal yang sudah disetujui | `docs/PROPOSAL_POS.md` |
@@ -58,7 +57,7 @@ Dilarang menambah NuGet, library, atau pola arsitektur baru tanpa persetujuan. T
 - Laporan manajemen memakai FastReport; struk thermal memakai `PrintDocument`. Jangan mencampur keduanya.
 - Template `.frx` dibuat dari kode karena FastReport OpenSource tidak punya designer.
 
-Detail kontrak laporan ada di `docs/SPECIFICATION.md` bagian 5. Jangan mengarang nama tabel, kolom, atau parameter sendiri.
+Detail perilaku laporan ada di `docs/SPECIFICATION.md` bagian 7 dan lampiran 11.2. Jangan mengarang isi laporan atau format output sendiri.
 
 ---
 
@@ -72,17 +71,17 @@ Detail kontrak laporan ada di `docs/SPECIFICATION.md` bagian 5. Jangan mengarang
 6. **Update konteks.** Setelah keputusan arsitektur atau bug fix, update `ctx/uas.md`.
 7. **Jangan menandai task selesai jika build masih error atau belum diuji.**
 
-### 5.1 Aturan Khusus Task Low-Impact
+### 5.1 Aturan Task Pendukung Non-Kritis
 
-Anggota dengan kapasitas terbatas ditempatkan pada task low-coupling. Aturannya:
+Task pendukung yang tidak berada di jalur kritis tetap punya deliverable nyata. Aturannya:
 
 - Task tidak boleh berada di jalur kritis checkout, stok, auth, atau laporan PDF.
 - Jika task gagal, fitur inti harus tetap bisa didemokan.
 - Task tidak boleh mengubah `TransactionService`, `InventoryService`, `RecipeService`, `Laporan.cs`, `KoneksiDB`, atau schema.
 - Deliverable harus jelas: form, grid, filter, seed data, atau dokumen.
-- Owner low-impact menyelesaikan deliverable sesuai kontrak; owner modul terkait menangani integrasi kritis bila diperlukan.
+- Owner task pendukung menyelesaikan deliverable sesuai kontrak; owner modul terkait menangani integrasi kritis bila diperlukan.
 
-Pembagian konkret ada di `workspace/TEAM.md`.
+Pembagian owner task ada di `workspace/TASKS.md`.
 
 ---
 
@@ -106,7 +105,7 @@ Sebuah task dianggap selesai jika:
 
 - [ ] Perilaku sesuai kontrak di `docs/SPECIFICATION.md`.
 - [ ] Build MSBuild 0 error.
-- [ ] Skenario utama task sudah diuji.
+- [ ] Skenario utama task sudah diuji oleh owner; setiap anggota menguji fiturnya sendiri.
 - [ ] Tidak ada SQL di UI, tidak ada koneksi terbuka, tidak ada nilai query hasil konkatenasi.
 - [ ] Tidak ada `TODO`, placeholder, atau handler kosong yang menyerupai fitur selesai.
 - [ ] File yang diubah sesuai scope task; tidak ada perubahan tak terkait.
@@ -133,7 +132,7 @@ Jangan memakai `dotnet restore` untuk project .NET Framework lama. Error `Runtim
 ## 9. Larangan Keras
 
 - Jangan mengubah `docs/PROPOSAL_POS.md` atau `PROPOSAL POS.docx` tanpa persetujuan.
-- Jangan mengubah schema tanpa memperbarui `schema_pos.sql` dan `docs/SPECIFICATION.md`.
+- Perubahan schema hanya oleh pemilik database dan wajib disinkronkan ke `database/schema_pos.sql`; dampak fitur dicatat di `docs/SPECIFICATION.md`.
 - Jangan menambahkan tabel/kolom yang tidak dipakai fitur.
 - Jangan menaruh logic bisnis di event handler UI.
 - Jangan memakai `double` untuk uang.

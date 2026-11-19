@@ -21,11 +21,10 @@ UAS_POS/
 ├── README.md                  # Ringkasan proyek & panduan tim
 ├── workspace/                 # Aturan kerja, pembagian tugas, dan task board
 │   ├── README.md              # Cara pakai workspace
-│   ├── TEAM.md                # Roster, ownership, dan task low-impact
-│   ├── TASKS.md               # Papan status task per fase
+│   ├── TASKS.md               # Roster, ownership, dan papan task per fase
 │   └── CONVENTIONS.md         # Branch, commit, cek mandiri, coding, build
 ├── docs/                      # Dokumen spesifikasi & naskah laporan
-│   ├── SPECIFICATION.md       # Spesifikasi arsitektur & alur kerja lengkap
+│   ├── SPECIFICATION.md       # Panduan fitur, alur kerja, dan kriteria selesai
 │   └── PROPOSAL_POS.md        # Proposal yang sudah disetujui
 ├── database/                  # Skrip basis data MySQL
 │   └── schema_pos.sql         # Skrip DDL 16 tabel (13 tabel inti + 3 pendukung)
@@ -35,10 +34,9 @@ UAS_POS/
 ### Aturan & Pembagian Tugas
 
 - Baca `AGENTS.md` sebelum mengubah kode.
-- `workspace/TEAM.md` memuat roster, ownership eksekusi, dan batas task low-impact.
-- `workspace/TASKS.md` adalah papan status task. Satu task satu owner.
+- `workspace/TASKS.md` memuat roster, ownership, ringkasan per anggota, dan papan status task. Satu task satu owner.
 - `workspace/CONVENTIONS.md` mengatur branch, commit, cek hasil task, build, dan coding.
-- Kontrak teknis tetap di `docs/SPECIFICATION.md`; DDL final di `database/schema_pos.sql`.
+- Panduan fitur ada di `docs/SPECIFICATION.md`; DDL final di `database/schema_pos.sql`.
 
 ---
 
