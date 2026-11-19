@@ -1,583 +1,317 @@
-# Spesifikasi Teknis & Arsitektur Sistem: Omni-Industry POS Engine
+# Spesifikasi & Panduan Sistem: Omni-Industry POS Engine
 
-## 1. Pendahuluan
+**Versi 3.0 — panduan tim.**
 
-Aplikasi ini dikembangkan sebagai pemenuhan Proyek Akhir (UAS) mata kuliah **Pemrograman Visual (Semester 3)**. Sistem dirancang sebagai *Point of Sales (POS)* dinamis berbasis desktop Windows Forms yang dapat beradaptasi dengan tiga karakteristik industri utama:
-
-1. **Retail**: Mengelola stok barang jadi, kode barcode, dan penjualan langsung.
-2. **Food & Beverage (F&B)**: Mengelola menu kuliner, komposisi bahan baku mentah (*Bill of Materials* / BOM), kalkulasi HPP otomatis, serta opsi simpan pesanan berbasis meja (*Hold Bill*).
-3. **Jasa / Servis**: Mengelola layanan tanpa pemotongan stok fisik barang dan pelacakan status pengerjaan.
-
-### 1.1 Status Dokumen
-
-- **Versi**: 2.0 (baseline development).
-- **Perubahan dari versi 1.0**: penetapan FastReport OpenSource untuk laporan manajemen berformat PDF, pemisahan batas antara laporan PDF dan struk thermal, penambahan tabel pendukung operasional, serta audit kesiapan development.
-- **Dokumen acuan**: `docs/PROPOSAL_POS.md` (proposal yang disetujui), `database/schema_pos.sql` (DDL final), dan pengalaman implementasi FastReport pada `W13/`.
-- **Aturan sinkronisasi**: setiap perubahan skema wajib dilakukan pada `schema_pos.sql` dan dideskripsikan di dokumen ini. Dokumen ini tidak boleh bertentangan dengan DDL.
-
-### 1.2 Ruang Lingkup Versi 1
-
-Fitur yang masuk ruang lingkup:
-
-- Onboarding Wizard, login, RBAC, dan manajemen cabang.
-- Master produk, kategori, bahan baku, resep/BOM, dan kalkulasi HPP.
-- Kasir dual-mode: bayar langsung (*Paid*) dan simpan tagihan (*Hold Bill*).
-- Pemotongan stok atomik, restock, stock opname, dan transfer antar-cabang.
-- Shift kasir: modal awal, rekonsiliasi *blind close*, dan rekap shift.
-- Manajemen pelanggan/member dan status pengerjaan jasa.
-- Laporan penjualan, laba kotor, mutasi stok, dan dashboard produk terlaris.
-- Struk thermal 58 mm melalui `PrintDocument`; laporan manajemen berupa PDF A4 melalui FastReport.
-
-Di luar ruang lingkup versi 1:
-
-- Pembayaran terbelah (*split payment*) dalam satu nota. Versi 1 memakai satu metode bayar per nota (`cash`, `qris`, atau `transfer`).
-- Integrasi langsung ke printer thermal merek tertentu, API pajak, dan sinkronisasi cloud.
-- Desain template FastReport melalui GUI designer. FastReport OpenSource tidak menyediakan designer.
+Dokumen ini menjelaskan cara kerja aplikasi dan aturan bisnis yang perlu diketahui seluruh anggota. Urusan database dan data contoh dikelola terpusat oleh pemilik database; anggota lain tidak perlu menyiapkannya.
 
 ---
 
-## 2. Arsitektur 3-Tier
+## 1. Ringkasan
 
-1. **Presentation Layer (`UI`)**:
-   - `LoginForm`: Autentikasi user dan pengecekan flag `is_onboarded`.
-   - `OnboardingWizardForm`: Tampil saat Super Admin login pertama kali.
-   - `MainForm`: Single-shell container dengan navigasi dinamis berbasis hak akses dan toggle fitur.
-   - `UserControl` per modul: `UcKasir`, `UcMasterProduk`, `UcResepBOM`, `UcInventaris`, `UcShift`, `UcPelanggan`, `UcServis`, `UcLaporan`.
-2. **Service / Business Logic Layer (`Services`)**:
-   - `OnboardingService`: Baca/tulis `app_config`.
-   - `AuthService`: Hashing SHA-256 dan verifikasi hak akses.
-   - `RecipeService`: Hitung total HPP menu dari daftar bahan baku mentah.
-   - `InventoryService`: Pemotongan stok kondisional, restock, stock opname, dan transfer.
-   - `TransactionService`: Pengelolaan transaksi kasir ber-status (*Paid, Hold, Void*) menggunakan `MySqlTransaction`.
-   - `ShiftService`: Validasi modal awal dan rekonsiliasi kasir.
-   - `ReportService`: Menyusun `DataTable` laporan dari filter, menghitung total, lalu memanggil pembuat PDF.
-3. **Repository / Data Access Layer (`Repositories`)**:
-   - `KoneksiDB`: Manajemen koneksi terpusat ke MySQL.
-   - Kelas static repository berbasis ADO.NET murni dengan parameterized queries (`@param`).
-   - `ReportRepository`: Query khusus laporan; tidak boleh mengembalikan koneksi terbuka.
+Omni-Industry POS Engine adalah aplikasi kasir desktop untuk Windows. Satu aplikasi yang sama dapat dipakai oleh tiga jenis usaha:
 
-### 2.1 Aturan Dependensi
+- **Retail**: minimarket, butik, toko kelontong.
+- **Food & Beverage (F&B)**: kafe, kedai kopi, restoran.
+- **Jasa**: bengkel, salon, laundry, layanan servis.
 
-- UI hanya memanggil Service; UI dilarang menulis SQL atau membuka `MySqlConnection`.
-- Service memanggil satu atau beberapa Repository; Service tidak boleh mengakses kontrol WinForms.
-- Repository hanya mengakses database; Repository tidak menampilkan `MessageBox`.
-- Semua koneksi dibungkus `using`. Semua nilai input masuk query melalui parameter, bukan konkatenasi string.
-- Objek uang memakai `decimal`, bukan `double`.
+Jenis usaha dipilih saat pertama kali aplikasi disiapkan. Menu dan fitur menyesuaikan pilihan tersebut, sehingga pengguna tidak melihat fitur yang tidak dipakai.
+
+Tujuan aplikasi:
+
+- Mempercepat transaksi kasir.
+- Menjaga stok tetap akurat.
+- Mencatat shift dan uang kas.
+- Menyediakan laporan penjualan, laba, dan stok.
 
 ---
 
-## 3. Skema Basis Data
+## 2. Tiga Model Bisnis
 
-Database: `db_uas_pos` (MySQL 8.x). DDL final ada di `database/schema_pos.sql`.
+| Model | Contoh usaha | Cara stok bekerja |
+| :--- | :--- | :--- |
+| Retail | Minimarket, butik | Stok barang jadi berkurang setiap penjualan. |
+| F&B | Kafe, restoran | Stok bahan mentah berkurang sesuai resep menu yang terjual. |
+| Jasa | Bengkel, salon, laundry | Tidak memotong stok barang; status pekerjaan dilacak. |
 
-Jumlah tabel: **16 tabel fisik**, terdiri atas **12 kelompok tabel inti** (tabel `stock_transfers` dan `stock_transfer_details` dihitung satu kelompok) dan **3 tabel pendukung** untuk fitur yang sudah tercantum di proposal: member, kartu stok, dan antrean jasa.
-
-### Tabel Konfigurasi & Autentikasi
-
-1. `app_config` (`id`, `setting_key`, `setting_value`)
-2. `branches` (`id`, `nama_cabang`, `alamat`, `no_telp`, `is_pusat`, `created_at`)
-3. `users` (`id`, `branch_id`, `username`, `password_hash`, `nama_lengkap`, `role`, `is_active`, `created_at`)
-
-### Tabel Katalog & Resep
-
-4. `categories` (`id`, `nama_kategori`, `tipe_bisnis`)
-5. `products` (`id`, `branch_id`, `category_id`, `kode_item`, `nama_produk`, `tipe`, `harga_jual`, `hpp_manual`, `stok`, `is_active`)
-6. `raw_materials` (`id`, `nama_bahan`, `satuan`, `harga_beli_satuan`, `stok_minimum`)
-7. `branch_materials` (`id`, `branch_id`, `raw_material_id`, `stok`)
-8. `product_recipes` (`id`, `product_id`, `raw_material_id`, `takaran`)
-
-### Tabel Kasir & Transaksi
-
-9. `shifts` (`id`, `branch_id`, `user_id`, `waktu_buka`, `waktu_tutup`, `modal_awal`, `uang_sistem`, `uang_fisik`, `selisih`, `status`)
-10. `transactions` (`id`, `nomor_nota`, `branch_id`, `user_id`, `customer_id`, `shift_id`, `waktu`, `subtotal`, `diskon`, `pajak`, `total_akhir`, `uang_bayar`, `kembalian`, `tipe_bayar`, `status`, `label_meja_pelanggan`)
-11. `transaction_details` (`id`, `transaction_id`, `product_id`, `qty`, `harga_satuan`, `hpp_satuan`, `subtotal`)
-
-### Tabel Mutasi Stok
-
-12. `stock_transfers` (`id`, `nomor_transfer`, `dari_branch_id`, `ke_branch_id`, `user_id`, `tanggal`, `status`)
-13. `stock_transfer_details` (`id`, `transfer_id`, `tipe_item`, `item_id`, `qty`)
-14. `stock_movements` (`id`, `branch_id`, `tipe_item`, `item_id`, `arah`, `qty`, `stok_sebelum`, `stok_sesudah`, `sumber`, `ref_id`, `nomor_dokumen`, `keterangan`, `user_id`, `waktu`)
-
-### Tabel Pendukung Operasional
-
-15. `customers` (`id`, `branch_id`, `nama`, `no_telp`, `email`, `poin`, `is_active`, `created_at`)
-16. `service_jobs` (`id`, `transaction_id`, `branch_id`, `nomor_antrean`, `status`, `teknisi_user_id`, `tanggal_masuk`, `tanggal_selesai`, `catatan`)
-
-### 3.1 Aturan Tabel Pendukung
-
-- `transactions.customer_id` boleh `NULL`; diisi hanya saat kasir memilih member. Relasi memakai `ON DELETE SET NULL`.
-- `stock_movements` adalah buku besar stok. Setiap perubahan stok wajib menulis satu baris di tabel ini di dalam transaksi database yang sama dengan perubahan stok.
-  - `tipe_item`: `product` atau `material`.
-  - `arah`: `in` atau `out`.
-  - `sumber`: `sale`, `restock`, `opname`, `transfer_in`, `transfer_out`, atau `void`.
-  - `ref_id`: ID transaksi, transfer, atau dokumen sumber; boleh `NULL` untuk restock/opname yang hanya memakai `nomor_dokumen`.
-  - `stok_sebelum` dan `stok_sesudah` dipakai untuk kartu stok dan audit.
-- `service_jobs` dibuat otomatis saat transaksi bertipe jasa disimpan, atau saat kasir menandai pesanan sebagai pekerjaan servis. Satu transaksi servis memiliki maksimal satu `service_jobs`.
-- `stock_movements.item_id` bersifat polimorfik (menunjuk `products.id` atau `raw_materials.id`), sehingga tidak memakai foreign key ke salah satu tabel. Validasi dilakukan di `InventoryService`.
+Satu usaha boleh menggabungkan beberapa model. Contoh: bengkel yang juga menjual oli dan suku cadang.
 
 ---
 
-## 4. Pembagian Modul Tim (6 Anggota)
+## 3. Alur Pemakaian
 
-```text
-1. Autentikasi & Konfigurasi
-~ Login & Role Access (RBAC)
-~ Onboarding Wizard
-~ Manajemen Cabang
-
-2. Master Data & Resep
-~ Kategori, Produk & Layanan
-~ Bahan Baku
-~ Resep / BOM
-~ Kalkulasi HPP Otomatis
-
-3. Kasir & Transaksi
-~ Katalog & Keranjang Belanja
-~ Bayar Langsung
-~ Simpan Tagihan (Hold Bill / Meja)
-~ Hitung Diskon, Pajak & Cetak Struk
-
-4. Inventaris & Stok
-~ Stok Masuk (Restock)
-~ Stock Opname (Penyesuaian Stok)
-~ Transfer Stok Antar-Cabang
-~ Peringatan Stok Menipis
-
-5. Operasional Kasir & Layanan
-~ Shift Kasir (Modal Awal & Tutup Kasir)
-~ Manajemen Pelanggan / Member
-~ Status Pengerjaan Jasa / Antrean
-
-6. Laporan & Analitik
-~ Laporan Penjualan (Harian, Bulanan, Cabang)
-~ Laporan Laba Kotor (Omzet minus HPP)
-~ Laporan Mutasi Stok
-~ Dashboard Menu Terlaris
-```
+1. **Login pertama.** Super Admin masuk dengan akun awal.
+2. **Onboarding.** Super Admin mengisi nama toko, alamat, telepon, jenis usaha, pajak, dan cabang pertama.
+3. **Siapkan data.** Tambahkan pengguna, cabang, kategori, produk/layanan, bahan baku, dan resep.
+4. **Buka shift.** Kasir memasukkan modal awal sebelum mulai melayani.
+5. **Transaksi.** Kasir memilih produk, mengisi keranjang, memberi diskon/pajak, lalu memilih bayar langsung atau simpan tagihan.
+6. **Stok berubah.** Stok berkurang otomatis. Barang masuk, opname, dan transfer dicatat lewat menu inventaris.
+7. **Tutup shift.** Kasir menghitung uang fisik; sistem menampilkan selisih terhadap uang seharusnya.
+8. **Laporan.** Pemilik atau manajer mencetak laporan PDF atau melihat dashboard.
 
 ---
 
-## 5. Arsitektur Pelaporan & Pencetakan
+## 4. Peran Pengguna
 
-### 5.1 Batas FastReport dan PrintDocument
-
-| Keluaran | Teknologi | Format | Alasan |
-| :--- | :--- | :--- | :--- |
-| Laporan penjualan | FastReport OpenSource + `PDFSimpleExport` | PDF A4 | Laporan tabel multi-halaman, filter, total, dan arsip digital. |
-| Laporan laba kotor | FastReport OpenSource + `PDFSimpleExport` | PDF A4 | Rekap omzet, HPP, dan margin per produk. |
-| Laporan mutasi stok | FastReport OpenSource + `PDFSimpleExport` | PDF A4 | Kartu stok berbasis `stock_movements`. |
-| Rekap shift kasir | FastReport OpenSource + `PDFSimpleExport` | PDF A4 | Bukti serah terima kasir dan rekonsiliasi kas. |
-| Struk nota kasir | `PrintDocument` WinForms | Thermal 58 mm (default) / 80 mm | Kertas thermal, lebar tetap, dicetak langsung ke printer. |
-| Salinan nota PDF | Tidak termasuk v1 | — | Bisa ditambahkan kemudian sebagai laporan FastReport A5 bila diminta dosen. |
-
-FastReport **tidak** dipakai untuk struk thermal. `PDFSimpleExport` menghasilkan PDF halaman penuh, bukan perintah cetak thermal. Pemisahan ini menjaga proposal yang sudah disetujui tetap berlaku: struk memakai `PrintDocument`, laporan manajemen memakai FastReport.
-
-Catatan rekonsiliasi proposal: proposal awal menyebut lembar rekapitulasi shift kasir dicetak dengan `PrintDocument` selebar struk. Spesifikasi v2 memindahkan rekap shift ke FastReport A4 karena isinya tabel rekonsiliasi multi-kolom, bukan struk thermal. Ruang lingkup fitur tidak berubah; yang berubah hanya media cetak laporan. Struk nota kasir tetap memakai `PrintDocument`.
-
-### 5.2 Dependensi dan Konfigurasi Proyek
-
-| Komponen | Versi / Konfigurasi |
-| :--- | :--- |
-| Target framework | .NET Framework **4.7.2** |
-| Bahasa | C# 7.3 |
-| Database driver | `MySql.Data` **8.4.0** |
-| Report engine | `FastReport.OpenSource` **2026.2.8** |
-| PDF exporter | `FastReport.OpenSource.Export.PdfSimple` **2026.2.8** |
-| Referensi wajib | `Microsoft.CSharp`, `System.Data`, `System.Drawing`, `System.Windows.Forms`, `System.Xml` |
-| Binding redirect | `AutoGenerateBindingRedirects` = `true` |
-| Restore paket | `MSBuild.exe <project>.csproj -t:Restore` |
-
-Catatan lingkungan:
-
-- `dotnet restore` gagal pada project .NET Framework lama dengan error `RuntimeIdentifier 'win'`. Gunakan MSBuild.
-- FastReport tetap kompatibel dengan .NET Framework 4.7.2 karena assembly paket menargetkan `net462`.
-- Project harus dijalankan sebagai `.exe` dengan `App.config` yang ikut tersalin, bukan dihosting PowerShell, agar binding redirect assembly berjalan.
-
-### 5.3 Struktur Class Pelaporan
-
-```text
-Services/
-  ReportService.cs          # filter, query, hitung total, panggil Laporan
-Repositories/
-  ReportRepository.cs       # query laporan (parameterized)
-Reports/
-  Laporan.cs                # mesin FastReport, template, export PDF
-  Templates/
-    laporan_penjualan.frx
-    laporan_laba_kotor.frx
-    laporan_mutasi_stok.frx
-    laporan_shift.frx
-```
-
-Tanggung jawab:
-
-- `ReportRepository` hanya menjalankan query dan mengembalikan `DataTable`.
-- `ReportService` memvalidasi filter (tanggal awal ≤ tanggal akhir, cabang wajib untuk manajer), memformat nilai uang/tanggal, menghitung total, lalu memanggil method `Laporan`.
-- `Laporan` tidak mengenal kontrol UI. Input-nya `DataTable`, parameter teks, dan nama file output.
-- `UcLaporan` hanya menampilkan filter, `DataGridView` pratinjau, tombol **Tampilkan** dan **Cetak PDF**.
-
-### 5.4 Daftar Laporan dan Kontrak Data
-
-Semua nama tabel `DataTable` dan nama kolom ditulis huruf kecil. Nama tabel harus sama dengan nama datasource di template `.frx`.
-
-#### A. Laporan Penjualan
-
-- Template: `laporan_penjualan.frx`
-- Nama tabel: `penjualan`
-- Filter: rentang tanggal, cabang, kasir, status nota (`paid`/`hold`/`void`), metode bayar (`cash`/`qris`/`transfer`).
-- Akses: Super Admin (semua cabang), Branch Manager (cabang sendiri).
-- Kolom:
-
-| Kolom | Isi |
-| :--- | :--- |
-| `nomor_nota` | Nomor nota |
-| `waktu` | Tanggal dan jam, format `dd/MM/yyyy HH:mm` |
-| `nama_cabang` | Nama cabang |
-| `nama_kasir` | Nama lengkap kasir |
-| `nama_pelanggan` | Nama member atau `-` |
-| `tipe_bayar` | `Tunai`, `QRIS`, atau `Transfer` |
-| `status` | `Lunas`, `Gantung`, atau `Batal` |
-| `subtotal` | Rupiah terformat |
-| `diskon` | Rupiah terformat |
-| `pajak` | Rupiah terformat |
-| `total_akhir` | Rupiah terformat |
-
-Total yang dikirim sebagai parameter: `total_subtotal`, `total_diskon`, `total_pajak`, `total_akhir`, dan `jumlah_nota`.
-
-#### B. Laporan Laba Kotor
-
-- Template: `laporan_laba_kotor.frx`
-- Nama tabel: `laba_kotor`
-- Filter: rentang tanggal, cabang, kategori.
-- Akses: Super Admin (semua cabang), Branch Manager (cabang sendiri).
-- Kolom:
-
-| Kolom | Isi |
-| :--- | :--- |
-| `nama_produk` | Nama produk/menu/layanan |
-| `nama_kategori` | Nama kategori atau `-` |
-| `qty_terjual` | Jumlah kuantitas, format `N2` |
-| `omzet` | Rupiah terformat |
-| `hpp` | Rupiah terformat |
-| `laba_kotor` | Rupiah terformat |
-| `margin_persen` | Persentase laba, format `N2` + `%` |
-
-Total parameter: `total_omzet`, `total_hpp`, `total_laba_kotor`, `margin_total_persen`.
-
-#### C. Laporan Mutasi Stok
-
-- Template: `laporan_mutasi_stok.frx`
-- Nama tabel: `mutasi_stok`
-- Filter: rentang tanggal, cabang, tipe item (`product`/`material`), item tertentu (opsional).
-- Akses: Super Admin (semua cabang), Branch Manager (cabang sendiri).
-- Kolom:
-
-| Kolom | Isi |
-| :--- | :--- |
-| `waktu` | Tanggal dan jam, format `dd/MM/yyyy HH:mm` |
-| `nomor_dokumen` | Nomor nota/transfer/dokumen restock/opname |
-| `nama_item` | Nama produk atau bahan mentah |
-| `tipe_item` | `Produk` atau `Bahan` |
-| `satuan` | Satuan item (`pcs`, `gram`, `ml`, dan seterusnya) |
-| `masuk` | Qty masuk, format `N2` |
-| `keluar` | Qty keluar, format `N2` |
-| `saldo` | Stok setelah mutasi, format `N2` |
-| `sumber` | `Penjualan`, `Restock`, `Opname`, `Transfer Masuk`, `Transfer Keluar`, `Void` |
-| `keterangan` | Keterangan tambahan atau `-` |
-| `nama_user` | Petugas yang mencatat |
-
-Total parameter: `total_masuk`, `total_keluar`.
-
-#### D. Rekap Shift Kasir
-
-- Template: `laporan_shift.frx`
-- Nama tabel: `rekap_shift`
-- Filter: shift tertentu, atau rentang tanggal + cabang + kasir.
-- Akses: Super Admin (semua), Branch Manager (cabang sendiri), Cashier (hanya shift miliknya).
-- Kolom:
-
-| Kolom | Isi |
-| :--- | :--- |
-| `nama_cabang` | Nama cabang |
-| `nama_kasir` | Nama kasir |
-| `waktu_buka` | Tanggal dan jam, format `dd/MM/yyyy HH:mm` |
-| `waktu_tutup` | Tanggal dan jam atau `-` bila masih open |
-| `modal_awal` | Rupiah terformat |
-| `total_tunai` | Total transaksi tunai `paid` selama shift |
-| `total_non_tunai` | Total QRIS/transfer `paid` selama shift |
-| `uang_sistem` | Rupiah terformat |
-| `uang_fisik` | Rupiah terformat |
-| `selisih` | Rupiah terformat; negatif diawali `-` |
-| `status` | `Buka` atau `Tutup` |
-
-Total parameter: `total_modal_awal`, `total_uang_sistem`, `total_uang_fisik`, `total_selisih`.
-
-#### E. Dashboard Produk Terlaris
-
-Dashboard bukan PDF. `UcLaporan` menampilkan `DataGridView` dan grafik batang (kontrol WinForms) dari query:
-
-```sql
-SELECT p.nama_produk, SUM(td.qty) AS qty_terjual, SUM(td.subtotal) AS omzet
-FROM transaction_details td
-JOIN transactions t ON t.id = td.transaction_id
-JOIN products p ON p.id = td.product_id
-WHERE t.status = 'paid'
-  AND t.waktu BETWEEN @awal AND @akhir
-  AND (@branch_id IS NULL OR t.branch_id = @branch_id)
-GROUP BY p.id, p.nama_produk
-ORDER BY qty_terjual DESC
-LIMIT 10;
-```
-
-### 5.5 Kontrak Template FastReport
-
-Setiap template memakai struktur band berikut:
-
-| Band | Fungsi |
-| :--- | :--- |
-| `ReportTitleBand` | Nama toko, alamat, telepon, dan judul laporan |
-| `PageHeaderBand` | Label kolom tabel |
-| `DataBand` bernama `Data1` | Baris data dari `DataTable` |
-| `ReportSummaryBand` | Total dan catatan |
-| `PageFooterBand` | “Halaman [Page#] dari [TotalPages#]”, waktu cetak, nama pencetak |
-
-Aturan teknis:
-
-- Kertas A4 portrait: `PaperWidth = 210` mm, `PaperHeight = 297` mm, margin 15 mm. Lebar konten maksimum 180 mm.
-- Posisi dan ukuran objek memakai pixel 96 dpi. Konversi wajib: `mm / 25.4f * 96f`. Jangan mencampur satuan mm dan pixel.
-- `DataHeaderBand` tidak boleh menjadi anak langsung `ReportPage`; gunakan `PageHeaderBand`, atau letakkan `DataHeaderBand` di dalam `DataBand`.
-- Ekspresi data memakai `[penjualan.nomor_nota]`, `[laba_kotor.omzet]`, dan seterusnya. Nama tabel harus sama dengan `DataTable.TableName`.
-- Nilai uang dan tanggal diformat di C# sebelum masuk `DataTable`. Template hanya menampilkan string, sehingga hasil tidak bergantung pada locale mesin.
-- Parameter laporan diisi dengan `report.SetParameterValue(nama, nilai)` setelah `Load()` dan sebelum `Prepare()`. Method ini membuat parameter bila belum ada.
-- Jangan memakai alias dataset yang bentrok dengan namespace FastReport. Panggil `report.RegisterData(ds)` tanpa alias, bukan `RegisterData(ds, "Data")`.
-- Panggil `report.Dictionary.Connections.Clear()` setelah `Load()` agar koneksi desainer yang tidak ada tidak ikut diproses.
-- Aktifkan datasource tabel (`report.GetDataSource(namaTabel).Enabled = true`) dan hubungkan `Data1` ke datasource tersebut.
-
-### 5.6 Alur Cetak PDF
-
-```text
-UcLaporan (filter)
-   -> ReportService.AmbilLaporan...()
-   -> ReportRepository (query parameterized)
-   -> DataTable + total + parameter teks
-   -> Laporan.Cetak...()
-   -> Report.Load(template .frx)
-   -> Dictionary.Connections.Clear()
-   -> RegisterData(ds)
-   -> SetParameterValue(...)
-   -> Prepare()
-   -> PDFSimpleExport.Export(report, path)
-   -> Process.Start(path)
-```
-
-Langkah wajib di `Laporan`:
-
-1. Pastikan folder output ada (`Directory.CreateDirectory`).
-2. Pastikan file template ada. Bila hilang, panggil `PastikanTemplate()` untuk membuat ulang dari kode.
-3. Sebelum `Prepare()`, sentuh `typeof(Microsoft.CSharp.RuntimeBinder.Binder).Assembly` dan `typeof(System.Linq.Enumerable).Assembly` untuk mencegah error `CS0006: Metadata file 'Microsoft.CSharp' could not be found`.
-4. Bungkus `Report` dengan `try/finally` dan panggil `Dispose()`.
-5. Simpan PDF dengan nama unik, lalu buka memakai `Process.Start(path)`.
-6. Bila `DataTable.Rows.Count == 0`, tampilkan `MessageBox` “Tidak ada data pada filter ini” dan jangan membuat PDF kosong.
-
-### 5.7 Lokasi dan Nama File Output
-
-- Folder: `Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)\OmniPOS\Laporan`.
-- Nama file:
-  - `LaporanPenjualan_yyyyMMdd_HHmmss.pdf`
-  - `LaporanLabaKotor_yyyyMMdd_HHmmss.pdf`
-  - `LaporanMutasiStok_yyyyMMdd_HHmmss.pdf`
-  - `RekapShift_yyyyMMdd_HHmmss.pdf`
-- Format waktu memakai `CultureInfo.InvariantCulture` agar nama file konsisten.
-- File lama tidak dihapus otomatis. Pembersihan manual dilakukan pengguna.
-
-### 5.8 Penanganan Error dan Batasan Paket
-
-- `CS0006: Metadata file 'Microsoft.CSharp' could not be found`: tambahkan `<Reference Include="Microsoft.CSharp" />` dan sentuh assembly sebelum `Prepare()`.
-- `CS0234 ... does not exist in the namespace 'FastReport.Data'`: jangan memakai alias dataset yang sama dengan namespace FastReport.
-- PDF hasil `PDFSimpleExport` berbentuk raster (satu JPEG per halaman). Teks tidak dapat diselect atau dicari. Ini batasan paket, bukan bug aplikasi dan sudah diterima untuk laporan UAS.
-- FastReport OpenSource tidak memiliki report designer. Template `.frx` dibuat dari kode dan disimpan sebagai artefak sumber; jangan mengandalkan GUI designer.
-- Bila `Prepare()` gagal karena binding redirect, pastikan aplikasi dijalankan sebagai `.exe` dengan `App.config`, bukan dari host PowerShell.
-
-### 5.9 Struk Thermal
-
-- Struk memakai `PrintDocument` dengan `PrintPage` yang menggambar teks dan garis.
-- Lebar default 58 mm; opsi 80 mm disediakan lewat pengaturan printer, bukan template FastReport.
-- Isi struk: nama toko/alamat/telepon dari `app_config`, nomor nota, waktu, kasir, daftar item (nama, qty, harga, subtotal), subtotal, diskon, pajak, total, metode bayar, uang bayar, kembalian, dan ucapan terima kasih.
-- Data struk diambil dari `transactions` + `transaction_details` setelah transaksi `Commit()`.
-- Cetak ulang struk memakai data yang sama; tidak membuat transaksi baru.
-
----
-
-## 6. Struktur Proyek dan Konvensi
-
-### 6.1 Struktur Solution
-
-```text
-UAS_POS/
-├── src/
-│   ├── OmniPos.sln
-│   └── OmniPos/
-│       ├── OmniPos.csproj
-│       ├── App.config
-│       ├── Program.cs
-│       ├── Forms/
-│       │   ├── LoginForm.cs
-│       │   ├── OnboardingWizardForm.cs
-│       │   └── MainForm.cs
-│       ├── Controls/
-│       │   ├── UcKasir.cs
-│       │   ├── UcMasterProduk.cs
-│       │   ├── UcResepBOM.cs
-│       │   ├── UcInventaris.cs
-│       │   ├── UcShift.cs
-│       │   ├── UcPelanggan.cs
-│       │   ├── UcServis.cs
-│       │   └── UcLaporan.cs
-│       ├── Services/
-│       ├── Repositories/
-│       ├── Models/
-│       └── Reports/
-│           ├── Laporan.cs
-│           └── Templates/*.frx
-├── database/schema_pos.sql
-└── docs/
-```
-
-### 6.2 Konvensi Kode
-
-- C# 7.3. Tidak memakai async/await, LINQ berantai panjang, generic/interface/abstract class, dependency injection, atau library di luar yang disetujui.
-- Nama class dan method: PascalCase. Variabel lokal dan parameter: camelCase.
-- Nama kontrol mengikuti pola `buttonSimpan`, `textBoxNama`, `dataGridViewProduk`, `labelTotal`.
-- Identifier domain boleh Bahasa Indonesia (`namaProduk`, `totalAkhir`) selama konsisten dalam satu class.
-- Setiap event handler UI memiliki `try/catch` yang menampilkan pesan error singkat dan tidak menelan exception tanpa jejak.
-- Service melakukan validasi input dan melempar `ArgumentException`/`InvalidOperationException` dengan pesan yang bisa ditampilkan UI.
-- Repository memakai `using` untuk koneksi, command, dan reader.
-- Nominal uang disimpan dan dihitung sebagai `decimal`; pembulatan dilakukan saat format tampilan.
-- Password disimpan sebagai hash SHA-256 hex lowercase sesuai proposal. Password plaintext tidak boleh dicatat di log atau pesan error.
-
-### 6.3 RBAC dan Navigasi
-
-| Menu / Aksi | Super Admin | Branch Manager | Cashier |
+| Aksi | Super Admin | Branch Manager | Kasir |
 | :--- | :---: | :---: | :---: |
-| Onboarding & manajemen cabang | Ya | Tidak | Tidak |
-| Master produk, bahan, resep/BOM | Ya | Ya (cabang sendiri) | Tidak |
-| Kasir & transaksi | Ya | Ya (cabang sendiri) | Ya |
-| Restock, opname, transfer | Ya | Ya (cabang sendiri) | Tidak |
-| Shift | Ya | Ya (cabang sendiri) | Ya (shift sendiri) |
-| Member & servis | Ya | Ya (cabang sendiri) | Ya |
-| Laporan penjualan & laba kotor | Ya | Ya (cabang sendiri) | Tidak |
-| Laporan mutasi stok | Ya | Ya (cabang sendiri) | Tidak |
-| Rekap shift | Ya | Ya (cabang sendiri) | Hanya shift sendiri |
-| Pengaturan pengguna | Ya | Tidak | Tidak |
+| Onboarding, cabang, pengguna | Ya | Tidak | Tidak |
+| Master produk, bahan, resep | Ya | Cabang sendiri | Tidak |
+| Kasir dan transaksi | Ya | Cabang sendiri | Ya |
+| Stok masuk, opname, transfer | Ya | Cabang sendiri | Tidak |
+| Shift kasir | Ya | Cabang sendiri | Shift sendiri |
+| Member dan servis | Ya | Cabang sendiri | Ya |
+| Laporan penjualan, laba, mutasi | Ya | Cabang sendiri | Tidak |
+| Rekap shift | Ya | Cabang sendiri | Shift sendiri |
 
-Aturan tambahan:
+Menu yang tidak boleh diakses tidak ditampilkan. Pemeriksaan hak akses tetap dilakukan di proses bisnis, bukan hanya di tampilan.
 
-- `MainForm` menyusun menu dari role dan feature flag. Menu yang tidak berhak tidak ditampilkan, bukan hanya dinonaktifkan.
-- Service tetap memeriksa role dan `branch_id`; menyembunyikan menu bukan kontrol keamanan.
-- `enable_multi_branch = 0` menyembunyikan menu transfer dan filter cabang; semua data memakai cabang pusat.
+---
 
-### 6.4 Feature Flag
+## 5. Fitur per Modul
 
-Nilai awal ada di `app_config`:
+### 5.1 Autentikasi & Konfigurasi
 
-| Key | Nilai | Efek |
+- Login dengan username dan password.
+- Akun nonaktif tidak bisa masuk.
+- Onboarding pertama kali: identitas toko, jenis usaha, pajak, dan cabang awal.
+- Menu utama menyesuaikan peran pengguna dan fitur yang diaktifkan.
+- Manajemen cabang dan pengguna.
+
+Aturan:
+
+- Password tidak disimpan sebagai teks biasa.
+- Super Admin dapat mengelola semua cabang; Branch Manager hanya cabangnya sendiri.
+- Pengaturan toko dipakai di tampilan, struk, dan laporan.
+
+### 5.2 Master Data & Resep
+
+- Kategori produk dan layanan.
+- Produk jadi, menu F&B, dan layanan jasa.
+- Bahan baku mentah beserta satuan dan harga beli.
+- Resep: daftar bahan dan takaran untuk setiap menu.
+- Perhitungan HPP otomatis dari resep.
+
+Aturan:
+
+- Kode item harus unik.
+- Produk nonaktif tidak muncul di kasir.
+- HPP dihitung dari total takaran dikali harga bahan.
+- Produk jasa tidak memiliki resep dan tidak memotong stok.
+
+### 5.3 Kasir & Transaksi
+
+- Pencarian dan katalog produk.
+- Keranjang belanja: tambah, kurangi, dan hapus item.
+- Diskon dan pajak.
+- Bayar langsung (*Paid*).
+- Simpan tagihan (*Hold Bill*), misalnya untuk pesanan meja.
+- Pembatalan nota (*Void*).
+- Cetak struk.
+
+Aturan:
+
+- Satu nota memakai satu metode bayar: tunai, QRIS, atau transfer.
+- Transaksi, rincian item, dan perubahan stok harus berhasil semua atau batal semua.
+- Hold Bill tidak memotong stok dua kali saat dilunasi.
+- Penjualan jasa tidak memotong stok barang.
+
+### 5.4 Inventaris & Stok
+
+- Barang masuk (*restock*).
+- Penyesuaian stok (*stock opname*).
+- Transfer stok antar-cabang.
+- Riwayat mutasi atau kartu stok.
+- Peringatan stok menipis.
+
+Aturan:
+
+- Setiap perubahan stok mencatat jumlah sebelum dan sesudah.
+- Setiap perubahan stok mencatat sumbernya: penjualan, restock, opname, transfer, atau void.
+- Stok dipisahkan per cabang.
+- Transfer memiliki status perjalanan dan tidak mengurangi stok dua kali.
+
+### 5.5 Operasional Kasir & Layanan
+
+- Buka dan tutup shift.
+- Rekap uang tunai dan non-tunai.
+- Data pelanggan/member.
+- Antrean dan status pekerjaan jasa.
+
+Aturan:
+
+- Satu kasir hanya memiliki satu shift aktif.
+- Tutup shift membandingkan uang sistem dengan uang fisik.
+- Member bersifat opsional; transaksi tetap bisa dilakukan tanpa member.
+- Satu transaksi servis memiliki satu catatan pekerjaan.
+
+### 5.6 Laporan & Analitik
+
+- Laporan penjualan.
+- Laporan laba kotor.
+- Laporan mutasi stok.
+- Rekap shift kasir.
+- Dashboard produk terlaris.
+
+Aturan:
+
+- Laporan manajemen berupa PDF ukuran A4.
+- Struk kasir dicetak ke printer thermal 58 mm atau 80 mm.
+- Filter tanpa data menampilkan pesan, bukan PDF kosong.
+- Hak akses laporan mengikuti peran pengguna.
+
+---
+
+## 6. Aturan Bisnis Utama
+
+- **Uang memakai perhitungan desimal.** Pembulatan hanya dilakukan saat ditampilkan.
+- **Transaksi bersifat all-or-nothing.** Jika satu bagian gagal, seluruh transaksi dibatalkan.
+- **Stok memiliki jejak audit.** Setiap perubahan stok dapat ditelusuri.
+- **Data dipisahkan per cabang.** Pengguna hanya melihat data cabang yang menjadi haknya.
+- **Satu nota satu metode bayar.** Pembayaran terbelah belum didukung.
+- **Jasa tidak memotong stok barang.**
+- **Setiap anggota menguji fiturnya sendiri.** Owner fitur transaksi dan stok juga menguji kasus gagal dan rollback.
+
+---
+
+## 7. Laporan & Struk
+
+### 7.1 Laporan PDF
+
+| Laporan | Isi utama | Akses |
 | :--- | :--- | :--- |
-| `is_onboarded` | `0` / `1` | Menentukan apakah wizard wajib tampil |
-| `business_name` | teks | Nama toko pada UI, struk, dan laporan |
-| `business_address` | teks | Alamat pada struk dan laporan |
-| `business_phone` | teks | Telepon pada struk dan laporan |
-| `enable_retail` | `0` / `1` | Menampilkan kategori dan produk retail |
-| `enable_fnb` | `0` / `1` | Menampilkan menu, bahan baku, dan resep |
-| `enable_recipe_bom` | `0` / `1` | Mengaktifkan kalkulasi HPP dan pemotongan bahan |
-| `enable_service` | `0` / `1` | Menampilkan layanan, antrean, dan status servis |
+| Penjualan | Nomor nota, tanggal, cabang, kasir, pelanggan, metode bayar, status, subtotal, diskon, pajak, total | Super Admin, Branch Manager |
+| Laba kotor | Produk, kategori, jumlah terjual, omzet, HPP, laba kotor, margin | Super Admin, Branch Manager |
+| Mutasi stok | Tanggal, nomor dokumen, item, masuk, keluar, saldo, sumber, petugas | Super Admin, Branch Manager |
+| Rekap shift | Cabang, kasir, jam buka/tutup, modal awal, tunai, non-tunai, uang sistem, uang fisik, selisih, status | Super Admin, Branch Manager, Kasir (shift sendiri) |
+
+Ketentuan umum:
+
+- Format PDF A4.
+- File otomatis terbuka setelah dibuat.
+- Nama file unik agar tidak menimpa laporan sebelumnya.
+- Header memuat identitas toko, judul laporan, periode, dan filter.
+- Total pada laporan harus sama dengan data yang ditampilkan.
+
+### 7.2 Dashboard Produk Terlaris
+
+Dashboard menampilkan sepuluh produk terlaris berdasarkan jumlah terjual dan omzet. Tampilannya berupa tabel dan grafik batang.
+
+### 7.3 Struk Thermal
+
+- Lebar 58 mm (default) atau 80 mm.
+- Berisi identitas toko, nomor nota, waktu, kasir, daftar item, subtotal, diskon, pajak, total, metode bayar, uang bayar, dan kembalian.
+- Cetak ulang memakai data nota yang sama; tidak membuat nota baru.
+
+---
+
+## 8. Pembagian Tugas
+
+Roster anggota, modul formal, bagian yang dikerjakan, dan status task ada di `workspace/TASKS.md`. Satu task satu owner.
+
+Setiap anggota bertanggung jawab menguji fiturnya sendiri sebelum menandai task selesai. Tidak ada task regresi terpusat.
+
+---
+
+## 9. Kriteria Selesai
+
+Aplikasi dianggap siap demonstrasi jika:
+
+- Login, onboarding, dan hak akses berjalan.
+- Master data dapat ditambah, diubah, dan dinonaktifkan.
+- Transaksi dapat disimpan, ditahan, dan dibatalkan.
+- Stok berkurang otomatis dan tercatat di riwayat.
+- Shift dapat dibuka dan ditutup dengan selisih yang benar.
+- Empat laporan PDF dan dashboard tampil sesuai filter.
+- Struk thermal tampil rapi.
+- Build menghasilkan 0 error.
+- Setiap owner sudah menguji fiturnya sendiri.
+
+---
+
+## 10. Ketentuan Teknis untuk Developer
+
+Bagian ini boleh dilewati pembaca non-teknis.
+
+- Aplikasi desktop **Windows Forms**.
+- .NET Framework **4.7.2**, C# **7.3**.
+- Database **MySQL** diakses lewat ADO.NET.
+- Database dan data contoh sudah disiapkan terpusat oleh pemilik database. Anggota lain tidak perlu membuat tabel atau menyiapkan data awal.
+- Struktur aplikasi tiga lapis:
+  - **Tampilan** menangani form dan kontrol.
+  - **Logika bisnis** menangani validasi dan aturan.
+  - **Akses data** menangani komunikasi ke database.
+- Tampilan tidak mengakses database langsung. Logika bisnis tidak menyentuh kontrol form. Akses data tidak menampilkan pesan ke pengguna.
+- Pengambilan data memakai parameter, bukan gabungan teks.
+- Koneksi, perintah, dan pembaca data ditutup setelah dipakai.
+- Perhitungan uang memakai `decimal`.
+
+Alat dan versi:
+
+| Komponen | Versi |
+| :--- | :--- |
+| .NET Framework | 4.7.2 |
+| C# | 7.3 |
+| MySql.Data | 8.4.0 |
+| FastReport.OpenSource | 2026.2.8 |
+| FastReport.OpenSource.Export.PdfSimple | 2026.2.8 |
+| Struk thermal | `PrintDocument` bawaan Windows Forms |
+
+Build memakai MSBuild. Jangan memakai `dotnet restore` untuk project .NET Framework lama.
+
+---
+
+## 11. Lampiran Teknis
+
+Bagian ini khusus pengembang dan boleh dilewati.
+
+### 11.1 Pengaturan Aplikasi
+
+| Pengaturan | Nilai | Efek |
+| :--- | :--- | :--- |
+| `is_onboarded` | `0` / `1` | Menentukan apakah wizard onboarding wajib tampil |
+| `business_name` | teks | Nama toko pada tampilan, struk, dan laporan |
+| `business_address` | teks | Alamat toko |
+| `business_phone` | teks | Telepon toko |
+| `enable_retail` | `0` / `1` | Mengaktifkan fitur retail |
+| `enable_fnb` | `0` / `1` | Mengaktifkan fitur F&B |
+| `enable_recipe_bom` | `0` / `1` | Mengaktifkan resep dan pemotongan bahan |
+| `enable_service` | `0` / `1` | Mengaktifkan layanan dan antrean servis |
 | `enable_shift` | `0` / `1` | Mewajibkan buka shift sebelum transaksi |
-| `enable_multi_branch` | `0` / `1` | Menampilkan transfer stok dan filter cabang |
-| `tax_percentage` | angka | Tarif pajak default transaksi |
+| `enable_multi_branch` | `0` / `1` | Mengaktifkan transfer stok dan filter cabang |
+| `tax_percentage` | angka | Tarif pajak default |
 
----
+### 11.2 Kontrak Data Laporan
 
-## 7. Kesiapan Development
+Nama tabel dan kolom data laporan harus konsisten antara pengambilan data, `DataTable`, dan template.
 
-### 7.1 Yang Sudah Siap
-
-- Arsitektur 3-tier, aturan dependensi, dan pembagian modul.
-- Dependensi dan versi paket yang sudah diverifikasi pada W13.
-- Skema inti dan tabel pendukung untuk member, kartu stok, dan antrean jasa.
-- Alur transaksi atomik, pemotongan stok kondisional, dan aturan `stock_movements`.
-- Kontrak data setiap laporan, nama template, parameter, dan format output.
-- Matriks RBAC dan feature flag.
-- Kriteria penerimaan laporan dan struk.
-
-### 7.2 Yang Belum Siap dan Menjadi Blocker Implementasi
-
-| Area | Status | Tindakan sebelum coding |
+| Laporan | Nama data | Kolom |
 | :--- | :--- | :--- |
-| Scaffold solution `src/OmniPos.sln` | Belum ada | Buat project .NET Framework 4.7.2, pasang paket, restore via MSBuild, build 0 error. |
-| Template `.frx` | Belum dibuat | Buat 4 template dari kode, uji dengan data contoh, commit file `.frx`. |
-| Data seed demo | Belum ada | Tambahkan seed 2 cabang, 3 user, 5 produk, 3 resep, 1 shift, dan 5 transaksi contoh. |
-| Mockup UI | Belum ada | Setujui layout `MainForm`, `UcKasir`, `UcLaporan`, dan form dialog. |
-| Query laporan | Baru kontrak | Implementasikan `ReportRepository` dan uji total terhadap data seed. |
-| Struk thermal | Baru kontrak | Tetapkan 58 mm sebagai default dan uji `PrintPreviewDialog`. |
-| Pengujian | Baru kriteria | Siapkan skenario uji per modul dan data uji rollback. |
+| Penjualan | `penjualan` | `nomor_nota`, `waktu`, `nama_cabang`, `nama_kasir`, `nama_pelanggan`, `tipe_bayar`, `status`, `subtotal`, `diskon`, `pajak`, `total_akhir` |
+| Laba kotor | `laba_kotor` | `nama_produk`, `nama_kategori`, `qty_terjual`, `omzet`, `hpp`, `laba_kotor`, `margin_persen` |
+| Mutasi stok | `mutasi_stok` | `waktu`, `nomor_dokumen`, `nama_item`, `tipe_item`, `satuan`, `masuk`, `keluar`, `saldo`, `sumber`, `keterangan`, `nama_user` |
+| Rekap shift | `rekap_shift` | `nama_cabang`, `nama_kasir`, `waktu_buka`, `waktu_tutup`, `modal_awal`, `total_tunai`, `total_non_tunai`, `uang_sistem`, `uang_fisik`, `selisih`, `status` |
 
-### 7.3 Definition of Ready per Fase
+Parameter total:
 
-**Fase 1 — Fondasi (bisa dimulai sekarang):**
-- Setup solution, `KoneksiDB`, `App.config`, dan struktur folder.
-- Login, onboarding, master data, dan RBAC.
-- Build 0 error dan koneksi database berhasil.
+- Penjualan: `total_subtotal`, `total_diskon`, `total_pajak`, `total_akhir`, `jumlah_nota`.
+- Laba kotor: `total_omzet`, `total_hpp`, `total_laba_kotor`, `margin_total_persen`.
+- Mutasi stok: `total_masuk`, `total_keluar`.
+- Rekap shift: `total_modal_awal`, `total_uang_sistem`, `total_uang_fisik`, `total_selisih`.
 
-**Fase 2 — Kasir & Stok:**
-- `TransactionService` atomik, `stock_movements`, struk thermal.
-- Uji rollback saat stok kurang.
-- Uji pemotongan produk retail, bahan F&B, dan layanan jasa.
+### 11.3 Catatan FastReport
 
-**Fase 3 — Laporan:**
-- Empat template `.frx` dan empat method `Laporan`.
-- `ReportService` + `ReportRepository`.
-- Uji PDF dengan data seed dan filter kosong.
-
-**Fase 4 — Finalisasi:**
-- Uji RBAC, multi-cabang, dan feature flag.
-- Uji regresi transaksi dan laporan.
-- Susun naskah akhir dan data demo.
+- FastReport OpenSource tidak memiliki desain grafis laporan. Template `.frx` dibuat dari kode.
+- Ekspor PDF memakai `PDFSimpleExport`. Hasilnya berupa gambar per halaman, sehingga teks tidak bisa diselect. Ini batasan paket dan sudah diterima.
+- Panggil `RegisterData` tanpa alias agar tidak bentrok dengan namespace FastReport.
+- Sebelum `Prepare()`, pastikan assembly `Microsoft.CSharp` dan `System.Linq` sudah termuat.
+- Struk thermal tidak memakai FastReport; gunakan `PrintDocument`.
 
 ---
 
-## 8. Kriteria Penerimaan
+## 12. Referensi
 
-### 8.1 Laporan PDF
-
-1. Build MSBuild menghasilkan 0 error dan paket FastReport termuat.
-2. Setiap laporan menghasilkan PDF di folder output dan otomatis terbuka.
-3. Header PDF memuat nama toko, alamat, telepon, judul, periode, dan info filter.
-4. Jumlah baris dan total pada PDF sama dengan hasil query dan `DataGridView`.
-5. Filter tanggal, cabang, kasir, status, dan metode bayar bekerja sesuai kontrak.
-6. Filter tanpa data menampilkan pesan “Tidak ada data pada filter ini” tanpa crash.
-7. PDF multi-halaman memiliki nomor halaman dan header kolom berulang.
-8. Branch Manager tidak dapat mencetak data cabang lain; Cashier tidak dapat membuka laporan manajemen.
-9. Nama file unik dan tidak menimpa file sebelumnya.
-
-### 8.2 Struk Thermal
-
-1. `PrintPreviewDialog` menampilkan struk 58 mm dengan teks tidak terpotong.
-2. Item, qty, harga, subtotal, diskon, pajak, total, bayar, dan kembalian benar.
-3. Cetak ulang tidak membuat nota baru.
-4. Struk tetap dapat dicetak saat fitur FastReport gagal dimuat.
-
-### 8.3 Transaksi dan Stok
-
-1. Transaksi gagal karena stok kurang tidak menyisakan header, detail, atau mutasi stok.
-2. Setiap perubahan stok menghasilkan satu baris `stock_movements` dengan `stok_sebelum` dan `stok_sesudah` yang benar.
-3. Transfer `pending` mengurangi stok asal; transfer `completed` menambah stok tujuan; pembatalan mengembalikan stok asal.
-4. Penjualan jasa tidak memotong stok produk atau bahan.
-5. Hold Bill dapat dilunasi tanpa menduplikasi detail atau memotong stok dua kali.
-
----
-
-## 9. Referensi Implementasi
-
-- FastReport W13: `W13/225310693 - Moreno Hernakov - tugas/week13_vp/Laporan.cs`.
-- Catatan teknis FastReport: `ctx/w13.md`.
-- DDL: `UAS_POS/database/schema_pos.sql`.
-- Proposal: `UAS_POS/docs/PROPOSAL_POS.md`.
+- Proposal resmi: `docs/PROPOSAL_POS.md`.
+- Skema database: `database/schema_pos.sql`.
+- Papan task dan pembagian anggota: `workspace/TASKS.md`.
+- Aturan kerja: `workspace/CONVENTIONS.md`.
+- Riwayat keputusan: `ctx/uas.md`.
