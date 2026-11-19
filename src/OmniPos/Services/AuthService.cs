@@ -27,7 +27,7 @@ namespace OmniPos.Services
 
         public HasilLogin Login(string username, string password)
         {
-            if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
+            if (string.IsNullOrWhiteSpace(username) || string.IsNullOrEmpty(password))
             {
                 return Gagal("Username dan password wajib diisi.");
             }
