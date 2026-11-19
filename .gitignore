@@ -1,0 +1,25 @@
+# Visual Studio / user state
+.vs/
+*.suo
+*.user
+*.userprefs
+*.rsuser
+*.cache
+
+# Build output
+[Bb]in/
+[Oo]bj/
+[Dd]ebug/
+[Rr]elease/
+
+# NuGet restore (packages.config)
+packages/
+*.nupkg
+
+# Test & log
+TestResults/
+*.log
+
+# Python helper cache
+__pycache__/
+*.pyc
