@@ -78,6 +78,77 @@ Aturan yang dicontohkan:
 - Project non-SDK: file baru didaftarkan di `.csproj` (`SubType` + `DependentUpon`). **Add > New Item** di Visual Studio menangani ini otomatis.
 - Desain di skala 100%. Jika Visual Studio menampilkan peringatan scaling 200%, klik **Restart Visual Studio with 100% scaling** agar layout tidak bertumpuk.
 
+### 4.3 Peta Menu, Halaman, dan Pemiliknya
+
+Shell `MainForm` menampilkan sidebar, header, dan satu halaman (`UserControl`) di `panelKonten`. Peta di bawah adalah kontrak: setiap menu punya halaman, task, dan owner. Menu yang belum punya `UserControl` menampilkan `UcSegeraHadir` sampai pemilik modul menyerahkan halamannya.
+
+| Grup | Menu | Halaman (`UserControl`) | Task | Owner halaman | Role | Feature flag |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| — | Beranda | `UcBeranda` | T-12 | Moreno | SA, BM, Kasir | — |
+| KASIR | Transaksi Kasir | `UcKasir` | T-21 (UI), T-26 (logic) | Gregorius (UI), Raymond (logic) | SA, BM, Kasir | — |
+| KASIR | Shift Kasir | `UcShift` | T-24 | Raymond | SA, BM, Kasir | `enable_shift` |
+| KASIR | Pelanggan | `UcPelanggan` | T-15 | Gregorius | SA, BM, Kasir | — |
+| KASIR | Antrean Servis | `UcServis` | T-17 (UI), T-25 (status) | Gregorius (UI), Raymond (status) | SA, BM, Kasir | `enable_service` |
+| MASTER DATA | Produk & Kategori | `UcMasterProduk` | T-13 | Rangga | SA, BM | — |
+| MASTER DATA | Bahan Baku | `UcBahanBaku` | T-14 | Rangga | SA, BM | `enable_fnb` |
+| MASTER DATA | Resep & HPP | `UcResepBOM` | T-14 | Rangga | SA, BM | `enable_recipe_bom` |
+| INVENTARIS | Stok Masuk | `UcInventaris` (tab masuk) | T-22 | Moreno | SA, BM | — |
+| INVENTARIS | Stok Opname | `UcInventaris` (tab opname) | T-22 | Moreno | SA, BM | — |
+| INVENTARIS | Transfer Stok | `UcInventaris` (tab transfer) | T-22 | Moreno | SA, BM | `enable_multi_branch` |
+| INVENTARIS | Riwayat Mutasi | `UcInventaris` (tab mutasi) | T-22 | Moreno | SA, BM | — |
+| LAPORAN & ANALITIK | Laporan | `UcLaporan` | T-16 (shell), T-30/T-32 (data) | Gregorius (shell), Valencia (data & PDF) | SA, BM | — |
+| LAPORAN & ANALITIK | Dashboard Produk Terlaris | `UcDashboard` | T-33 | Valencia | SA, BM | — |
+| PENGATURAN | Profil Toko | `UcPengaturanToko` | T-18 | Bagas | SA | — |
+| PENGATURAN | Cabang & Pengguna | `UcPengaturanPengguna` | T-18 | Bagas | SA | — |
+
+Keterangan role: SA = `super_admin`, BM = `branch_manager`, Kasir = `cashier`.
+
+Submenu di dalam halaman (bukan menu sidebar):
+
+- `UcLaporan` memuat empat jenis laporan lewat filter: penjualan, laba kotor, mutasi stok, dan rekap shift.
+- `UcInventaris` memuat empat tab: stok masuk, opname, transfer, dan riwayat mutasi. Shell mengirim tab awal lewat method publik, bukan lewat constructor.
+- Rekap shift untuk Kasir dibuka dari `UcShift` (shift sendiri), bukan dari menu Laporan.
+
+Aturan shell:
+
+1. Visibilitas menu hanya ditentukan di `MainForm.SusunMenu()` dari role pengguna dan nilai `app_config`. Halaman tidak menyembunyikan menu sendiri.
+2. Hak akses tetap diperiksa di service. Menyembunyikan menu bukan pengganti validasi bisnis.
+3. Satu `panelKonten` hanya menampung satu halaman. Shell membuang halaman lama sebelum menampilkan yang baru.
+4. `MainForm` adalah file milik owner shell. Pemilik modul **tidak mengedit** `MainForm`; serahkan nama class halaman, lalu owner shell menambahkan satu `case` di `BuatHalaman()`.
+5. Halaman menerima data lewat method publik setelah `new` (contoh `AturData(...)`), bukan lewat constructor, agar tetap bisa dibuka di View Designer.
+6. Menu atau submenu baru wajib memperbarui tabel ini, `SusunMenu()`, dan `workspace/TASKS.md` pada commit yang sama.
+7. Label menu ditulis dalam bahasa bisnis dan `UseMnemonic = false`, sehingga karakter `&` tampil apa adanya.
+
+### 4.4 Tema Visual Shell
+
+Shell memakai satu tema minimalis agar semua modul terlihat satu aplikasi.
+
+| Token | Nilai | Pemakaian |
+| :--- | :--- | :--- |
+| Primer | `#2563EB` | tombol utama, menu aktif, avatar |
+| Primer gelap | `#1D4ED8` | hover tombol/menu aktif |
+| Aksen | `#EA580C` | penanda sekunder (belum dipakai di shell) |
+| Latar | `#F8FAFC` | latar form |
+| Latar konten | `#F1F5F9` | area kerja di dalam `panelKonten` |
+| Kartu | `#FFFFFF` | panel konten, kartu beranda |
+| Border | `#E2E8F0` | garis header dan pemisah |
+| Teks | `#1E293B` | judul dan teks utama |
+| Teks muted | `#475569` | keterangan |
+| Teks lembut | `#64748B` | label grup dan metadata |
+| Sidebar | `#111827` | latar sidebar |
+| Sidebar hover | `#1F2937` | hover menu |
+| Sidebar teks | `#D1D5DB` | teks menu tidak aktif |
+| Sidebar muted | `#94A3B8` | label grup sidebar |
+
+Aturan:
+
+- Font tunggal `Segoe UI` (pengganti aman untuk Rubik/Nunito Sans yang tidak terpasang di Windows). Skala: 20 pt sapaan, 13.5 pt judul halaman, 9.5 pt isi, 8.5 pt metadata, 8 pt label grup.
+- Jarak mengikuti kelipatan 4/8 px; tombol menu 40 px, tombol utama 40 px, header 76 px, sidebar 248 px.
+- Kontras teks minimal 4.5:1. Menu aktif putih di `#2563EB`; menu tidak aktif `#D1D5DB` di `#111827`.
+- Ikon memakai bentuk geometris dari `Panel` sampai ada aset ikon resmi. Jangan memakai emoji sebagai ikon.
+- `Tema.cs` menyimpan token untuk kontrol yang dibuat dari kode. Designer tetap memakai nilai literal karena file `*.Designer.cs` ditulis oleh Visual Studio.
+- Halaman modul mengikuti token yang sama; jangan menambah palet atau font baru tanpa memperbarui tabel ini.
+
 ## 5. Aturan Database
 
 - Schema final ada di `database/schema_pos.sql`.
@@ -101,17 +172,26 @@ Aturan yang dicontohkan:
 | File / Folder | Owner utama | Perlu koordinasi |
 | :--- | :--- | :--- |
 | `src/OmniPos/Forms/LoginForm*` | Moreno | Bagas |
-| `src/OmniPos/Forms/MainForm*`, `OnboardingWizardForm*` | Bagas | Moreno |
-| `src/OmniPos/Controls/UcMasterProduk*` | Rangga | — |
-| `src/OmniPos/Controls/UcKasir*` | Raymond | Agung untuk layout |
-| `src/OmniPos/Controls/UcInventaris*` | Moreno | — |
-| `src/OmniPos/Controls/UcShift*`, `UcServis*` | Raymond | Agung untuk UI read-only |
-| `src/OmniPos/Controls/UcLaporan*` | Valencia | Agung untuk shell UI |
-| `src/OmniPos/Controls/UcPelanggan*` | Gregorius Priyagung | Dukungan integrasi Raymond bila perlu |
+| `src/OmniPos/Forms/MainForm*` | Moreno | Bagas |
+| `src/OmniPos/Controls/UcBeranda*`, `UcSegeraHadir*` | Moreno | — |
+| `src/OmniPos/Tema.cs` | Moreno | Semua owner halaman |
+| `src/OmniPos/Forms/OnboardingWizardForm*` | Bagas | Moreno |
+| `src/OmniPos/Controls/UcMasterProduk*`, `UcKategori*` | Rangga | — |
+| `src/OmniPos/Controls/UcBahanBaku*`, `UcResepBOM*` | Rangga | Moreno (HPP) |
+| `src/OmniPos/Controls/UcKasir*` | Gregorius Priyagung | Raymond (logic transaksi) |
+| `src/OmniPos/Controls/UcInventaris*` | Moreno | Raymond |
+| `src/OmniPos/Controls/UcShift*` | Raymond | Gregorius Priyagung (UI) |
+| `src/OmniPos/Controls/UcServis*` | Gregorius Priyagung | Raymond (status pekerjaan) |
+| `src/OmniPos/Controls/UcLaporan*` | Valencia | Gregorius Priyagung (shell UI) |
+| `src/OmniPos/Controls/UcDashboard*` | Valencia | — |
+| `src/OmniPos/Controls/UcPelanggan*` | Gregorius Priyagung | Raymond (integrasi checkout) |
+| `src/OmniPos/Controls/UcPengaturanToko*`, `UcPengaturanPengguna*` | Bagas | Moreno |
 | `src/OmniPos/Services/TransactionService.cs` | Raymond | Bagas, Moreno |
 | `src/OmniPos/Services/InventoryService.cs` | Moreno | Raymond |
+| `src/OmniPos/Services/RecipeService.cs` | Rangga | Moreno |
 | `src/OmniPos/Reports/` | Valencia | Moreno |
 | `src/OmniPos/Repositories/KoneksiDB.cs` | Moreno | Bagas |
+| `src/OmniPos/Repositories/PengaturanRepository.cs`, `Services/PengaturanService.cs` | Moreno | Bagas |
 | `src/OmniPos/Services/AuthService.cs` | Moreno | Bagas |
 | `database/schema_pos.sql` | Moreno | Bagas |
 | `docs/SPECIFICATION.md` | Moreno | Semua owner modul |
