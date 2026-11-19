@@ -36,15 +36,15 @@ Catatan:
 | ID | Task | Owner | Depends on | Status | Catatan |
 | :--- | :--- | :--- | :--- | :--- | :--- |
 | T-00 | Perancangan arsitektur, model data, dan aturan kerja tim | Moreno | — | Done | Fondasi reusable: `docs/SPECIFICATION.md`, `database/schema_pos.sql`, panduan `workspace/` |
-| T-01 | Penyiapan fondasi aplikasi dan lingkungan pengembangan | Moreno | T-00 | Todo | Scaffold `src/OmniPos.sln` (net472), paket FastReport/MySql, restore MSBuild; blocker semua task kode |
-| T-02 | Penyiapan data awal dan contoh bisnis | Moreno | T-01 | Todo | Import schema + seed demo; Agung membantu data contoh, schema tetap tanggung jawab Moreno |
-| T-03 | Koneksi aplikasi ke basis data | Moreno | T-01 | Todo | `App.config` + `KoneksiDB` + tes koneksi; jangan hardcode credential |
+| T-01 | Penyiapan fondasi aplikasi dan lingkungan pengembangan | Moreno | T-00 | Done | `src/OmniPos.sln` (net472, C# 7.3), paket MySql.Data/FastReport, restore+build MSBuild 0 error |
+| T-02 | Penyiapan data awal dan contoh bisnis | Moreno | T-01 | Done | `database/seed_demo.sql` + `database/README.md`; 16 tabel, 5 akun demo, seed aman dijalankan ulang |
+| T-03 | Koneksi aplikasi ke basis data | Moreno | T-01 | Done | `App.config` + `KoneksiDB`; tes koneksi ke MariaDB 11.4 lulus, kredensial di config bukan di kode |
 
 ## Fase 1 — Akses Pengguna, Data Master, dan Tampilan Pendukung
 
 | ID | Task | Owner | Depends on | Status | Catatan |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| T-10 | Login pengguna dan validasi hak akses | Moreno | T-03 | Todo | `LoginForm` + `AuthService` SHA-256, cek user aktif; uji password salah dan user nonaktif. Dijadikan contoh alur referensi UI → Service → Repository |
+| T-10 | Login pengguna dan validasi hak akses | Moreno | T-03 | Done | `LoginForm` + `AuthService` + `UserRepository` SHA-256; lulus uji login benar, password salah, input kosong, akun nonaktif. Integrasi `MainForm` menunggu T-12 |
 | T-11 | Penyiapan awal toko (onboarding) | Bagas | T-03 | Todo | `OnboardingWizardForm` + `app_config`; empat tahap, set `is_onboarded=1`. Integrasi setelah T-10 |
 | T-12 | Menu utama dan navigasi sesuai peran | Bagas | T-03 | Todo | `MainForm` shell + role/feature flag; menu yang tidak berhak disembunyikan. Integrasi login setelah T-10 |
 | T-13 | Pengelolaan produk dan kategori | Rangga | T-03 | Todo | `UcMasterProduk` + `UcKategori`; CRUD sederhana, validasi kode item |
@@ -60,7 +60,7 @@ Catatan:
 | T-20 | Pemrosesan transaksi penjualan secara utuh | Raymond | T-03 | Todo | `TransactionService` atomik: header, detail, hold, void; `MySqlTransaction` + rollback. Uji dengan produk setelah T-13, resep F&B setelah T-14 |
 | T-21 | Tampilan kasir (katalog dan keranjang) | Gregorius Priyagung | T-03 | Todo | `UcKasir` layout, keranjang, tombol; tanpa logic transaksi. Integrasi ke `MainForm` setelah T-12 |
 | T-26 | Alur kasir: pilih produk, bayar, simpan tagihan | Raymond | T-20 | Todo | `UcKasir` logic: katalog, keranjang, bayar, hold bill; integrasi event UI setelah T-21 |
-| T-22 | Pengelolaan stok: barang masuk, opname, dan transfer | Moreno | T-03 | Todo | `InventoryService` + `stock_movements` untuk restock/opname/transfer; setiap perubahan stok wajib ledger. Pemotongan saat sale diintegrasikan dengan T-20 |
+| T-22 | Pengelolaan stok: barang masuk, opname, dan transfer | Moreno | T-03 | Todo | `InventoryService` + `stock_movements` untuk restock/opname/transfer; setiap perubahan stok wajib ledger. Pemotongan saat sale diintegrasikan dengan T-20. Perlu keputusan desain: stok produk tersimpan per baris `products.branch_id`, sedangkan transfer butuh stok tujuan |
 | T-23 | Cetak struk belanja | Raymond | T-03 | Todo | `PrintDocument` thermal 58/80 mm; cetak ulang tidak membuat nota baru. Uji dengan nota setelah T-20 |
 | T-24 | Buka dan tutup shift kasir | Raymond | T-03 | Todo | `ShiftService` + `UcShift`: buka, blind close, rekap. Rekap diuji setelah T-20 |
 | T-25 | Pelacakan status pekerjaan jasa | Raymond | T-03 | Todo | Status/antrean servis + `service_jobs`; satu job per transaksi servis. Uji dengan transaksi servis setelah T-20 |
