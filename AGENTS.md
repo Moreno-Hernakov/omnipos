@@ -56,6 +56,7 @@ Dilarang menambah NuGet, library, atau pola arsitektur baru tanpa persetujuan. T
 - Setiap perubahan stok wajib menulis `stock_movements` dengan `stok_sebelum` dan `stok_sesudah`.
 - Laporan manajemen memakai FastReport; struk thermal memakai `PrintDocument`. Jangan mencampur keduanya.
 - Template `.frx` dibuat dari kode karena FastReport OpenSource tidak punya designer.
+- Form/UserControl memakai pola WinForms biasa: logic di `*.cs`, layout di `*.Designer.cs`. Kontrol statis dibuat di designer; kode dinamis hanya untuk item berulang.
 
 Detail perilaku laporan ada di `docs/SPECIFICATION.md` bagian 7 dan lampiran 11.2. Jangan mengarang isi laporan atau format output sendiri.
 

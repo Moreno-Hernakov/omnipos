@@ -70,6 +70,14 @@ Aturan yang dicontohkan:
 - Koneksi, command, dan reader dibungkus `using`.
 - Pesan error untuk pengguna disiapkan di UI; detail teknis tidak ditampilkan mentah.
 
+### 4.2 UI dan Windows Forms Designer
+
+- Form/UserControl memakai pola biasa: logic di `*.cs`, layout di `*.Designer.cs`. File `.resx` hanya dibuat kalau memakai gambar/ikon/ImageList.
+- Layout statis dibuat lewat **View Designer**, bukan `new Button()` di constructor. Kode dinamis hanya untuk item berulang; container dan item tetap dibuat di designer.
+- Constructor Form hanya memanggil `InitializeComponent()`; akses database/service ditaruh di `Load` dan dilewati saat design-time.
+- Project non-SDK: file baru didaftarkan di `.csproj` (`SubType` + `DependentUpon`). **Add > New Item** di Visual Studio menangani ini otomatis.
+- Desain di skala 100%. Jika Visual Studio menampilkan peringatan scaling 200%, klik **Restart Visual Studio with 100% scaling** agar layout tidak bertumpuk.
+
 ## 5. Aturan Database
 
 - Schema final ada di `database/schema_pos.sql`.
