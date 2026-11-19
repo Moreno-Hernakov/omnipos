@@ -13,11 +13,6 @@ namespace OmniPos.Forms
 {
     public partial class MainForm : Form
     {
-        private static readonly Color WarnaSidebar = Color.FromArgb(17, 24, 39);
-        private static readonly Color WarnaMenu = Color.FromArgb(209, 213, 219);
-        private static readonly Color WarnaMenuAktif = Color.FromArgb(37, 99, 235);
-        private static readonly Color WarnaMenuHover = Color.FromArgb(31, 41, 55);
-
         private User pengguna;
         private PengaturanAplikasi pengaturan = new PengaturanAplikasi();
         private Button tombolMenuAktif;
@@ -91,10 +86,36 @@ namespace OmniPos.Forms
             string namaPeran = NamaPeran(pengguna.Role);
 
             Text = "OmniPOS - " + pengaturan.NamaToko;
-            labelNamaToko.Text = pengaturan.NamaToko;
-            labelCabang.Text = "Cabang: " + pengaturan.NamaCabang;
+            labelLogoSub.Text = pengaturan.NamaToko;
+            labelJudulHalaman.Text = "Beranda";
+            labelJejak.Text = pengaturan.NamaToko + " / " + pengaturan.NamaCabang;
             labelPengguna.Text = pengguna.NamaLengkap;
             labelPeran.Text = namaPeran;
+            labelInisial.Text = AmbilInisial(pengguna.NamaLengkap);
+        }
+
+        private string AmbilInisial(string nama)
+        {
+            if (string.IsNullOrWhiteSpace(nama))
+            {
+                return "?";
+            }
+
+            string[] bagian = nama.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+
+            if (bagian.Length == 0)
+            {
+                return "?";
+            }
+
+            string inisial = bagian[0].Substring(0, 1);
+
+            if (bagian.Length > 1)
+            {
+                inisial += bagian[bagian.Length - 1].Substring(0, 1);
+            }
+
+            return inisial.ToUpper();
         }
 
         private void SusunMenu()
@@ -174,10 +195,10 @@ namespace OmniPos.Forms
             Label labelGrup = new Label();
             labelGrup.AutoSize = false;
             labelGrup.Width = LebarTombolMenu();
-            labelGrup.Height = 30;
-            labelGrup.Margin = new Padding(2, 14, 0, 2);
-            labelGrup.Font = new Font("Segoe UI", 8F, FontStyle.Bold);
-            labelGrup.ForeColor = Color.FromArgb(156, 163, 175);
+            labelGrup.Height = 32;
+            labelGrup.Margin = new Padding(2, 16, 0, 4);
+            labelGrup.Font = Tema.FontGrup;
+            labelGrup.ForeColor = Tema.SidebarMuted;
             labelGrup.Text = judul;
             labelGrup.TextAlign = ContentAlignment.BottomLeft;
 
@@ -188,16 +209,16 @@ namespace OmniPos.Forms
         {
             Button tombol = new Button();
             tombol.Width = LebarTombolMenu();
-            tombol.Height = 38;
+            tombol.Height = 40;
             tombol.Margin = new Padding(0, 2, 0, 2);
             tombol.FlatStyle = FlatStyle.Flat;
             tombol.FlatAppearance.BorderSize = 0;
-            tombol.FlatAppearance.MouseOverBackColor = WarnaMenuHover;
-            tombol.BackColor = WarnaSidebar;
-            tombol.ForeColor = WarnaMenu;
-            tombol.Font = new Font("Segoe UI", 9.5F);
+            tombol.FlatAppearance.MouseOverBackColor = Tema.SidebarHover;
+            tombol.BackColor = Tema.Sidebar;
+            tombol.ForeColor = Tema.SidebarTeks;
+            tombol.Font = Tema.FontMenu;
             tombol.TextAlign = ContentAlignment.MiddleLeft;
-            tombol.Padding = new Padding(12, 0, 0, 0);
+            tombol.Padding = new Padding(14, 0, 0, 0);
             tombol.Cursor = Cursors.Hand;
             tombol.UseMnemonic = false;
             tombol.Text = judul;
@@ -234,17 +255,20 @@ namespace OmniPos.Forms
         {
             TampilkanHalaman(kunci, judul);
 
+            labelJudulHalaman.Text = judul;
+            labelJejak.Text = pengaturan.NamaToko + " / " + pengaturan.NamaCabang;
+
             if (tombolMenuAktif != null)
             {
-                tombolMenuAktif.BackColor = WarnaSidebar;
-                tombolMenuAktif.ForeColor = WarnaMenu;
-                tombolMenuAktif.FlatAppearance.MouseOverBackColor = WarnaMenuHover;
+                tombolMenuAktif.BackColor = Tema.Sidebar;
+                tombolMenuAktif.ForeColor = Tema.SidebarTeks;
+                tombolMenuAktif.FlatAppearance.MouseOverBackColor = Tema.SidebarHover;
             }
 
             tombolMenuAktif = tombol;
-            tombol.BackColor = WarnaMenuAktif;
+            tombol.BackColor = Tema.Primer;
             tombol.ForeColor = Color.White;
-            tombol.FlatAppearance.MouseOverBackColor = WarnaMenuAktif;
+            tombol.FlatAppearance.MouseOverBackColor = Tema.PrimerGelap;
         }
 
         private void TampilkanHalaman(string kunci, string judul)
@@ -274,7 +298,7 @@ namespace OmniPos.Forms
                 beranda.AturData(
                     "Selamat datang, " + pengguna.NamaLengkap,
                     NamaPeran(pengguna.Role) + " - " + pengaturan.NamaCabang,
-                    "Modul aktif: " + DaftarModulAktif());
+                    AmbilModulAktif());
                 return beranda;
             }
 
@@ -284,7 +308,7 @@ namespace OmniPos.Forms
             return segeraHadir;
         }
 
-        private string DaftarModulAktif()
+        private string[] AmbilModulAktif()
         {
             List<string> modul = new List<string>();
 
@@ -303,12 +327,7 @@ namespace OmniPos.Forms
                 modul.Add("Jasa");
             }
 
-            if (modul.Count == 0)
-            {
-                return "belum ada modul bisnis yang diaktifkan";
-            }
-
-            return string.Join(", ", modul.ToArray());
+            return modul.ToArray();
         }
 
         private string NamaPeran(string role)

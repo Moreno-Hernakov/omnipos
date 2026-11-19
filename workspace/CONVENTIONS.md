@@ -119,6 +119,36 @@ Aturan shell:
 6. Menu atau submenu baru wajib memperbarui tabel ini, `SusunMenu()`, dan `workspace/TASKS.md` pada commit yang sama.
 7. Label menu ditulis dalam bahasa bisnis dan `UseMnemonic = false`, sehingga karakter `&` tampil apa adanya.
 
+### 4.4 Tema Visual Shell
+
+Shell memakai satu tema minimalis agar semua modul terlihat satu aplikasi.
+
+| Token | Nilai | Pemakaian |
+| :--- | :--- | :--- |
+| Primer | `#2563EB` | tombol utama, menu aktif, avatar |
+| Primer gelap | `#1D4ED8` | hover tombol/menu aktif |
+| Aksen | `#EA580C` | penanda sekunder (belum dipakai di shell) |
+| Latar | `#F8FAFC` | latar form |
+| Latar konten | `#F1F5F9` | area kerja di dalam `panelKonten` |
+| Kartu | `#FFFFFF` | panel konten, kartu beranda |
+| Border | `#E2E8F0` | garis header dan pemisah |
+| Teks | `#1E293B` | judul dan teks utama |
+| Teks muted | `#475569` | keterangan |
+| Teks lembut | `#64748B` | label grup dan metadata |
+| Sidebar | `#111827` | latar sidebar |
+| Sidebar hover | `#1F2937` | hover menu |
+| Sidebar teks | `#D1D5DB` | teks menu tidak aktif |
+| Sidebar muted | `#94A3B8` | label grup sidebar |
+
+Aturan:
+
+- Font tunggal `Segoe UI` (pengganti aman untuk Rubik/Nunito Sans yang tidak terpasang di Windows). Skala: 20 pt sapaan, 13.5 pt judul halaman, 9.5 pt isi, 8.5 pt metadata, 8 pt label grup.
+- Jarak mengikuti kelipatan 4/8 px; tombol menu 40 px, tombol utama 40 px, header 76 px, sidebar 248 px.
+- Kontras teks minimal 4.5:1. Menu aktif putih di `#2563EB`; menu tidak aktif `#D1D5DB` di `#111827`.
+- Ikon memakai bentuk geometris dari `Panel` sampai ada aset ikon resmi. Jangan memakai emoji sebagai ikon.
+- `Tema.cs` menyimpan token untuk kontrol yang dibuat dari kode. Designer tetap memakai nilai literal karena file `*.Designer.cs` ditulis oleh Visual Studio.
+- Halaman modul mengikuti token yang sama; jangan menambah palet atau font baru tanpa memperbarui tabel ini.
+
 ## 5. Aturan Database
 
 - Schema final ada di `database/schema_pos.sql`.
@@ -144,6 +174,7 @@ Aturan shell:
 | `src/OmniPos/Forms/LoginForm*` | Moreno | Bagas |
 | `src/OmniPos/Forms/MainForm*` | Moreno | Bagas |
 | `src/OmniPos/Controls/UcBeranda*`, `UcSegeraHadir*` | Moreno | — |
+| `src/OmniPos/Tema.cs` | Moreno | Semua owner halaman |
 | `src/OmniPos/Forms/OnboardingWizardForm*` | Bagas | Moreno |
 | `src/OmniPos/Controls/UcMasterProduk*`, `UcKategori*` | Rangga | — |
 | `src/OmniPos/Controls/UcBahanBaku*`, `UcResepBOM*` | Rangga | Moreno (HPP) |

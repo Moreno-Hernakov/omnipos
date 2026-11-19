@@ -3,11 +3,14 @@ namespace OmniPos.Controls
     partial class UcBeranda
     {
         private System.ComponentModel.IContainer components = null;
+        private System.Windows.Forms.Panel panelKartu;
         private System.Windows.Forms.Label labelSapaan;
         private System.Windows.Forms.Label labelKeterangan;
-        private System.Windows.Forms.Label labelModulAktif;
-        private System.Windows.Forms.Label labelPetunjuk;
         private System.Windows.Forms.Panel panelGaris;
+        private System.Windows.Forms.Label labelModulJudul;
+        private System.Windows.Forms.FlowLayoutPanel panelModul;
+        private System.Windows.Forms.Label labelPetunjuk;
+        private System.Windows.Forms.Label labelBantuan;
 
         protected override void Dispose(bool disposing)
         {
@@ -20,21 +23,41 @@ namespace OmniPos.Controls
 
         private void InitializeComponent()
         {
+            this.panelKartu = new System.Windows.Forms.Panel();
             this.labelSapaan = new System.Windows.Forms.Label();
             this.labelKeterangan = new System.Windows.Forms.Label();
-            this.labelModulAktif = new System.Windows.Forms.Label();
-            this.labelPetunjuk = new System.Windows.Forms.Label();
             this.panelGaris = new System.Windows.Forms.Panel();
+            this.labelModulJudul = new System.Windows.Forms.Label();
+            this.panelModul = new System.Windows.Forms.FlowLayoutPanel();
+            this.labelPetunjuk = new System.Windows.Forms.Label();
+            this.labelBantuan = new System.Windows.Forms.Label();
+            this.panelKartu.SuspendLayout();
             this.SuspendLayout();
+            //
+            // panelKartu
+            //
+            this.panelKartu.BackColor = System.Drawing.Color.White;
+            this.panelKartu.Controls.Add(this.labelBantuan);
+            this.panelKartu.Controls.Add(this.labelPetunjuk);
+            this.panelKartu.Controls.Add(this.panelModul);
+            this.panelKartu.Controls.Add(this.labelModulJudul);
+            this.panelKartu.Controls.Add(this.panelGaris);
+            this.panelKartu.Controls.Add(this.labelKeterangan);
+            this.panelKartu.Controls.Add(this.labelSapaan);
+            this.panelKartu.Dock = System.Windows.Forms.DockStyle.Top;
+            this.panelKartu.Location = new System.Drawing.Point(0, 0);
+            this.panelKartu.Name = "panelKartu";
+            this.panelKartu.Size = new System.Drawing.Size(960, 320);
+            this.panelKartu.TabIndex = 0;
             //
             // labelSapaan
             //
-            this.labelSapaan.AutoSize = true;
-            this.labelSapaan.Font = new System.Drawing.Font("Segoe UI", 18F, System.Drawing.FontStyle.Bold);
-            this.labelSapaan.ForeColor = System.Drawing.Color.FromArgb(17, 24, 39);
-            this.labelSapaan.Location = new System.Drawing.Point(32, 28);
+            this.labelSapaan.AutoEllipsis = true;
+            this.labelSapaan.Font = new System.Drawing.Font("Segoe UI", 20F, System.Drawing.FontStyle.Bold);
+            this.labelSapaan.ForeColor = System.Drawing.Color.FromArgb(30, 41, 59);
+            this.labelSapaan.Location = new System.Drawing.Point(38, 32);
             this.labelSapaan.Name = "labelSapaan";
-            this.labelSapaan.Size = new System.Drawing.Size(198, 32);
+            this.labelSapaan.Size = new System.Drawing.Size(840, 38);
             this.labelSapaan.TabIndex = 0;
             this.labelSapaan.Text = "Selamat datang";
             //
@@ -42,8 +65,8 @@ namespace OmniPos.Controls
             //
             this.labelKeterangan.AutoSize = true;
             this.labelKeterangan.Font = new System.Drawing.Font("Segoe UI", 9.5F);
-            this.labelKeterangan.ForeColor = System.Drawing.Color.FromArgb(75, 85, 99);
-            this.labelKeterangan.Location = new System.Drawing.Point(34, 70);
+            this.labelKeterangan.ForeColor = System.Drawing.Color.FromArgb(71, 85, 105);
+            this.labelKeterangan.Location = new System.Drawing.Point(42, 78);
             this.labelKeterangan.Name = "labelKeterangan";
             this.labelKeterangan.Size = new System.Drawing.Size(180, 17);
             this.labelKeterangan.TabIndex = 1;
@@ -54,48 +77,66 @@ namespace OmniPos.Controls
             this.panelGaris.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.panelGaris.BackColor = System.Drawing.Color.FromArgb(226, 232, 240);
-            this.panelGaris.Location = new System.Drawing.Point(32, 112);
+            this.panelGaris.Location = new System.Drawing.Point(40, 110);
             this.panelGaris.Name = "panelGaris";
-            this.panelGaris.Size = new System.Drawing.Size(720, 1);
+            this.panelGaris.Size = new System.Drawing.Size(860, 1);
             this.panelGaris.TabIndex = 2;
+            //
+            // labelModulJudul
+            //
+            this.labelModulJudul.AutoSize = true;
+            this.labelModulJudul.Font = new System.Drawing.Font("Segoe UI", 8F, System.Drawing.FontStyle.Bold);
+            this.labelModulJudul.ForeColor = System.Drawing.Color.FromArgb(100, 116, 139);
+            this.labelModulJudul.Location = new System.Drawing.Point(40, 132);
+            this.labelModulJudul.Name = "labelModulJudul";
+            this.labelModulJudul.Size = new System.Drawing.Size(120, 13);
+            this.labelModulJudul.TabIndex = 3;
+            this.labelModulJudul.Text = "MODUL BISNIS AKTIF";
+            //
+            // panelModul
+            //
+            this.panelModul.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.panelModul.Location = new System.Drawing.Point(38, 154);
+            this.panelModul.Name = "panelModul";
+            this.panelModul.Size = new System.Drawing.Size(860, 34);
+            this.panelModul.TabIndex = 4;
+            this.panelModul.WrapContents = false;
             //
             // labelPetunjuk
             //
             this.labelPetunjuk.AutoSize = true;
             this.labelPetunjuk.Font = new System.Drawing.Font("Segoe UI", 10F);
-            this.labelPetunjuk.ForeColor = System.Drawing.Color.FromArgb(31, 41, 55);
-            this.labelPetunjuk.Location = new System.Drawing.Point(32, 136);
+            this.labelPetunjuk.ForeColor = System.Drawing.Color.FromArgb(30, 41, 59);
+            this.labelPetunjuk.Location = new System.Drawing.Point(40, 214);
             this.labelPetunjuk.Name = "labelPetunjuk";
             this.labelPetunjuk.Size = new System.Drawing.Size(330, 19);
-            this.labelPetunjuk.TabIndex = 3;
+            this.labelPetunjuk.TabIndex = 5;
             this.labelPetunjuk.Text = "Pilih menu di panel kiri untuk mulai bekerja.";
             //
-            // labelModulAktif
+            // labelBantuan
             //
-            this.labelModulAktif.AutoSize = true;
-            this.labelModulAktif.Font = new System.Drawing.Font("Segoe UI", 9F);
-            this.labelModulAktif.ForeColor = System.Drawing.Color.FromArgb(107, 114, 128);
-            this.labelModulAktif.Location = new System.Drawing.Point(34, 170);
-            this.labelModulAktif.Name = "labelModulAktif";
-            this.labelModulAktif.Size = new System.Drawing.Size(120, 15);
-            this.labelModulAktif.TabIndex = 4;
-            this.labelModulAktif.Text = "Modul aktif";
+            this.labelBantuan.AutoSize = true;
+            this.labelBantuan.Font = new System.Drawing.Font("Segoe UI", 9F);
+            this.labelBantuan.ForeColor = System.Drawing.Color.FromArgb(100, 116, 139);
+            this.labelBantuan.Location = new System.Drawing.Point(42, 240);
+            this.labelBantuan.Name = "labelBantuan";
+            this.labelBantuan.Size = new System.Drawing.Size(320, 15);
+            this.labelBantuan.TabIndex = 6;
+            this.labelBantuan.Text = "Menu mengikuti peran pengguna dan pengaturan toko.";
             //
             // UcBeranda
             //
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.BackColor = System.Drawing.Color.FromArgb(248, 250, 252);
-            this.Controls.Add(this.labelModulAktif);
-            this.Controls.Add(this.labelPetunjuk);
-            this.Controls.Add(this.panelGaris);
-            this.Controls.Add(this.labelKeterangan);
-            this.Controls.Add(this.labelSapaan);
+            this.BackColor = System.Drawing.Color.FromArgb(241, 245, 249);
+            this.Controls.Add(this.panelKartu);
             this.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.Name = "UcBeranda";
-            this.Size = new System.Drawing.Size(900, 600);
+            this.Size = new System.Drawing.Size(960, 640);
+            this.panelKartu.ResumeLayout(false);
+            this.panelKartu.PerformLayout();
             this.ResumeLayout(false);
-            this.PerformLayout();
         }
     }
 }
