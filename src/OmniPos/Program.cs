@@ -2,6 +2,7 @@ using System;
 using System.Diagnostics;
 using System.Windows.Forms;
 using OmniPos.Forms;
+using OmniPos.Models;
 using OmniPos.Services;
 
 namespace OmniPos
@@ -28,17 +29,30 @@ namespace OmniPos
                 return;
             }
 
-            using (LoginForm formLogin = new LoginForm())
+            // Login dan shell berulang agar tombol Keluar mengembalikan pengguna ke halaman login.
+            while (true)
             {
-                if (formLogin.ShowDialog() == DialogResult.OK)
+                User pengguna;
+
+                using (LoginForm formLogin = new LoginForm())
                 {
-                    // T-12 (Bagas) akan mengganti pesan ini dengan MainForm.
-                    MessageBox.Show(
-                        "Login berhasil sebagai " + formLogin.PenggunaLogin.NamaLengkap +
-                        " (" + formLogin.PenggunaLogin.Role + "). Menu utama belum tersedia.",
-                        "Login Berhasil",
-                        MessageBoxButtons.OK,
-                        MessageBoxIcon.Information);
+                    if (formLogin.ShowDialog() != DialogResult.OK)
+                    {
+                        break;
+                    }
+
+                    pengguna = formLogin.PenggunaLogin;
+                }
+
+                using (MainForm formUtama = new MainForm())
+                {
+                    formUtama.Pengguna = pengguna;
+                    Application.Run(formUtama);
+
+                    if (!formUtama.KeluarKarenaLogout)
+                    {
+                        break;
+                    }
                 }
             }
         }

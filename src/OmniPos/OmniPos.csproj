@@ -51,11 +51,32 @@
     <Compile Include="Forms\LoginForm.Designer.cs">
       <DependentUpon>LoginForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\MainForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\MainForm.Designer.cs">
+      <DependentUpon>MainForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\UcBeranda.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\UcBeranda.Designer.cs">
+      <DependentUpon>UcBeranda.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\UcSegeraHadir.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\UcSegeraHadir.Designer.cs">
+      <DependentUpon>UcSegeraHadir.cs</DependentUpon>
+    </Compile>
     <Compile Include="Models\User.cs" />
+    <Compile Include="Models\PengaturanAplikasi.cs" />
     <Compile Include="Repositories\KoneksiDB.cs" />
     <Compile Include="Repositories\UserRepository.cs" />
+    <Compile Include="Repositories\PengaturanRepository.cs" />
     <Compile Include="Services\AuthService.cs" />
     <Compile Include="Services\SistemService.cs" />
+    <Compile Include="Services\PengaturanService.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
