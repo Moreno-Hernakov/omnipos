@@ -8,9 +8,10 @@ Satu folder untuk seluruh dokumen kerja proyek. Kode ada di `../src/`, skrip dat
 2. **`02-TASKS.md`** — cari task milikmu, owner, dependency, dan status.
 3. **`06-SPESIFIKASI.md`** — kontrak perilaku fitur dan aturan bisnis.
 4. **`07-ALUR-PENGGUNA.md`** — alur layar, isi field onboarding, field pelanggan, dan user story.
-5. **`03-CONVENTIONS.md`** — branch, commit, build, ownership, dan Definition of Done.
-6. **`04-ARSITEKTUR.md`** — lapisan aplikasi dan koneksi database. Baca sebelum menyentuh kode.
-7. **`05-UI-SHELL.md`** — shell, menu, dan UserControl. Baca sebelum membuat halaman.
+5. **`08-MOCKUP-HALAMAN.md`** — tata letak ASCII setiap layar (Windows Forms) dan keputusan desain yang masih terbuka.
+6. **`03-CONVENTIONS.md`** — branch, commit, build, ownership, dan Definition of Done.
+7. **`04-ARSITEKTUR.md`** — lapisan aplikasi dan koneksi database. Baca sebelum menyentuh kode.
+8. **`05-UI-SHELL.md`** — shell, menu, dan UserControl. Baca sebelum membuat halaman.
 
 Riwayat keputusan lintas sesi ada di `ctx/uas.md` (di luar repo).
 
@@ -25,6 +26,7 @@ Riwayat keputusan lintas sesi ada di `ctx/uas.md` (di luar repo).
 | `05-UI-SHELL.md` | Form vs UserControl, peta menu, cara tambah menu/UC, tema | Sebelum membuat UI | Moreno + owner halaman |
 | `06-SPESIFIKASI.md` | Perilaku fitur, aturan bisnis, laporan, kriteria selesai | Sebelum menerima task | Moreno + semua owner modul |
 | `07-ALUR-PENGGUNA.md` | Alur layar, isi field onboarding per halaman, field pelanggan, user story | Sebelum membuat Form/UserControl | Moreno + owner halaman |
+| `08-MOCKUP-HALAMAN.md` | Mockup ASCII per layar, susunan kontrol Windows Forms, keputusan terbuka | Sebelum membuat Form/UserControl | Moreno + owner halaman |
 | `proposal/` | Proposal resmi `.md` dan `.docx` | Saat butuh naskah akademik | Tidak boleh diubah tanpa persetujuan |
 
 ## Cara Pakai
@@ -40,7 +42,7 @@ Aturan status dan prinsip pembagian ada di `02-TASKS.md`.
 
 ## Aturan Dokumen
 
-- **Satu topik satu tempat.** Perilaku fitur dan aturan bisnis hanya di `06-SPESIFIKASI.md`; alur layar, isi field form, dan user story hanya di `07-ALUR-PENGGUNA.md`; cara teknis hanya di `04-ARSITEKTUR.md` dan `05-UI-SHELL.md`; status hanya di `02-TASKS.md`. Jangan menyalin isi yang sama ke dua file.
+- **Satu topik satu tempat.** Perilaku fitur dan aturan bisnis hanya di `06-SPESIFIKASI.md`; alur layar, isi field form, dan user story hanya di `07-ALUR-PENGGUNA.md`; tata letak layar (mockup ASCII) hanya di `08-MOCKUP-HALAMAN.md`; cara teknis hanya di `04-ARSITEKTUR.md` dan `05-UI-SHELL.md`; status hanya di `02-TASKS.md`. Jangan menyalin isi yang sama ke dua file.
 - **Perubahan menyentuh beberapa file.** Kalau kontrak fitur berubah, perbarui `06-SPESIFIKASI.md` dan `02-TASKS.md` pada commit yang sama. Kalau menu baru, perbarui `05-UI-SHELL.md` juga.
 - **Proposal beku.** `proposal/` adalah artefak akademik yang sudah disetujui. Perubahan teknis setelah approval dicatat di `06-SPESIFIKASI.md`, bukan dengan mengedit proposal diam-diam.
 - **Path relatif.** Dokumen di folder ini saling menunjuk dengan nama file, bukan path absolut.

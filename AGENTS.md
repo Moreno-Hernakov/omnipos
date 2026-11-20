@@ -11,10 +11,11 @@ Aturan khusus untuk folder `UAS_POS/`. Aturan global di `AGENTS.md` root workspa
 3. `docs/01-README.md` — peta dokumen.
 4. `docs/06-SPESIFIKASI.md` — kontrak perilaku fitur.
 5. `docs/07-ALUR-PENGGUNA.md` — alur layar, isi field onboarding, field pelanggan, user story.
-6. `docs/02-TASKS.md` — task, owner, dependency, status.
-7. `docs/04-ARSITEKTUR.md` — sebelum menulis kode.
-8. `docs/05-UI-SHELL.md` — sebelum membuat halaman atau menu.
-9. `ctx/uas.md` — riwayat keputusan sesi sebelumnya.
+6. `docs/08-MOCKUP-HALAMAN.md` — tata letak ASCII setiap layar sebelum membuat Form/UserControl.
+7. `docs/02-TASKS.md` — task, owner, dependency, status.
+8. `docs/04-ARSITEKTUR.md` — sebelum menulis kode.
+9. `docs/05-UI-SHELL.md` — sebelum membuat halaman atau menu.
+10. `ctx/uas.md` — riwayat keputusan sesi sebelumnya.
 
 Jangan mulai menulis kode sebelum membaca spec dan task yang menjadi tanggung jawabmu.
 
@@ -27,6 +28,7 @@ Jangan mulai menulis kode sebelum membaca spec dan task yang menjadi tanggung ja
 | Peta dokumen dan cara pakai | `docs/01-README.md` |
 | Perilaku fitur, aturan bisnis, kriteria penerimaan | `docs/06-SPESIFIKASI.md` |
 | Alur layar, isi field form/onboarding, user story | `docs/07-ALUR-PENGGUNA.md` |
+| Tata letak layar (mockup ASCII), keputusan desain terbuka | `docs/08-MOCKUP-HALAMAN.md` |
 | Pembagian tugas, ownership, dan status task | `docs/02-TASKS.md` |
 | Branch, commit, build, file ownership, DoD | `docs/03-CONVENTIONS.md` |
 | Arsitektur, service/repository, koneksi database | `docs/04-ARSITEKTUR.md` |

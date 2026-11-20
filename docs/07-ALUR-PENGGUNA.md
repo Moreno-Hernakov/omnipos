@@ -45,7 +45,7 @@ Aturan:
 
 Jumlah halaman mengikuti proposal: **empat**, tanpa halaman sambutan terpisah. Satu `OnboardingWizardForm` dengan panel per langkah, indikator "Langkah n dari 4", tombol **Batal**, **Kembali**, dan **Lanjut**/**Selesai**.
 
-Mockup wireframe tiap halaman ada di `mockups/`. Ukuran 900×640, font Segoe UI, dan warna mengikuti tema shell di `05-UI-SHELL.md` §6. Ini acuan layout, bukan file Designer final: jarak boleh disesuaikan saat implementasi, field dan urutan tidak.
+Gambar tata letak tiap langkah ada di `08-MOCKUP-HALAMAN.md` §3.2 (ASCII, kontrol Windows Forms). Itu acuan susunan kontrol, bukan file Designer final: jarak boleh disesuaikan saat implementasi, field dan urutan tidak.
 
 Aturan global:
 
@@ -57,7 +57,7 @@ Aturan global:
 
 ### Halaman 1 — Identitas Usaha
 
-![Mockup halaman 1: identitas usaha](mockups/onboarding-1-identitas.svg)
+Tata letak: `08-MOCKUP-HALAMAN.md` §3.2, langkah 1.
 
 | Field | Kunci `app_config` | Wajib | Aturan |
 | :--- | :--- | :---: | :--- |
@@ -67,7 +67,7 @@ Aturan global:
 
 ### Halaman 2 — Model Bisnis
 
-![Mockup halaman 2: model bisnis](mockups/onboarding-2-model-bisnis.svg)
+Tata letak: `08-MOCKUP-HALAMAN.md` §3.2, langkah 2.
 
 | Field | Kunci `app_config` | Wajib | Aturan |
 | :--- | :--- | :---: | :--- |
@@ -82,7 +82,7 @@ Aturan global:
 
 ### Halaman 3 — Mesin & Operasional
 
-![Mockup halaman 3: mesin dan operasional](mockups/onboarding-3-operasional.svg)
+Tata letak: `08-MOCKUP-HALAMAN.md` §3.2, langkah 3.
 
 | Field | Kunci `app_config` | Wajib | Aturan |
 | :--- | :--- | :---: | :--- |
@@ -95,7 +95,7 @@ Catatan `enable_multi_branch`: flag ini sudah ada di `06-SPESIFIKASI.md` §9.1 d
 
 ### Halaman 4 — Cabang & Akun
 
-![Mockup halaman 4: cabang pusat dan akun administrator](mockups/onboarding-4-cabang-akun.svg)
+Tata letak: `08-MOCKUP-HALAMAN.md` §3.2, langkah 4.
 
 | Field | Tabel | Wajib | Aturan |
 | :--- | :--- | :---: | :--- |

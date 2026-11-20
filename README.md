@@ -27,6 +27,8 @@ UAS_POS/
 │   ├── 04-ARSITEKTUR.md       # Stack, 3 lapis, service/repository, koneksi
 │   ├── 05-UI-SHELL.md         # Form vs UserControl, menu, tema
 │   ├── 06-SPESIFIKASI.md      # Perilaku fitur & aturan bisnis
+│   ├── 07-ALUR-PENGGUNA.md    # Alur layar, field onboarding, user story
+│   ├── 08-MOCKUP-HALAMAN.md   # Mockup ASCII setiap layar (Windows Forms)
 │   └── proposal/              # Proposal resmi (.md & .docx)
 ├── database/                  # Skrip basis data MySQL
 │   ├── README.md              # Setup server & akun aplikasi

@@ -42,7 +42,7 @@ Alur hidup:
 
 ## 3. Peta Menu
 
-Shell menampilkan sidebar, header, dan satu halaman di `panelKonten`. Tabel ini adalah kontrak: setiap menu punya halaman, task, dan owner. Menu yang belum punya `UserControl` menampilkan `UcSegeraHadir`.
+Shell menampilkan sidebar, header, dan satu halaman di `panelKonten`. Tabel ini adalah kontrak: setiap menu punya halaman, task, dan owner. Menu yang belum punya `UserControl` menampilkan `UcSegeraHadir`. Susunan kontrol tiap halaman digambar di `08-MOCKUP-HALAMAN.md`.
 
 | Grup | Menu | Halaman (`UserControl`) | Task | Owner halaman | Role | Feature flag |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
