@@ -133,6 +133,7 @@ Contoh pola service: `AuthService.Login` mengembalikan `HasilLogin` dengan `Berh
 - Transaksi penjualan membungkus header nota, detail nota, dan pemotongan stok dalam satu transaksi.
 - Setiap perubahan stok wajib menulis `stock_movements` dengan `stok_sebelum` dan `stok_sesudah` pada transaksi yang sama.
 - Sumber mutasi harus jelas: penjualan, restock, opname, transfer, atau void.
+- Batas modul: `TransactionService` menangani mutasi penjualan/hold/void; `InventoryService` menangani restock/opname/transfer. Tidak saling memanggil kode, hanya berbagi tabel `stock_movements`.
 - Uji kasus sukses dan kasus gagal/rollback.
 
 ## 8. Gaya Kode

@@ -47,10 +47,10 @@ Shell menampilkan sidebar, header, dan satu halaman di `panelKonten`. Tabel ini 
 | Grup | Menu | Halaman (`UserControl`) | Task | Owner halaman | Role | Feature flag |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
 | — | Beranda | `UcBeranda` | T-12 | Moreno | SA, BM, Kasir | — |
-| KASIR | Transaksi Kasir | `UcKasir` | T-21 (UI), T-26 (logic) | Gregorius (UI), Raymond (logic) | SA, BM, Kasir | — |
+| KASIR | Transaksi Kasir | `UcKasir` | T-21 | Raymond | SA, BM, Kasir | — |
 | KASIR | Shift Kasir | `UcShift` | T-24 | Raymond | SA, BM, Kasir | `enable_shift` |
 | KASIR | Pelanggan | `UcPelanggan` | T-15 | Gregorius | SA, BM, Kasir | — |
-| KASIR | Antrean Servis | `UcServis` | T-17 (UI), T-25 (status) | Gregorius (UI), Raymond (status) | SA, BM, Kasir | `enable_service` |
+| KASIR | Antrean Servis | `UcServis` | T-25 | Raymond | SA, BM, Kasir | `enable_service` |
 | MASTER DATA | Produk & Kategori | `UcMasterProduk` | T-13 | Rangga | SA, BM | — |
 | MASTER DATA | Bahan Baku | `UcBahanBaku` | T-14 | Rangga | SA, BM | `enable_fnb` |
 | MASTER DATA | Resep & HPP | `UcResepBOM` | T-14 | Rangga | SA, BM | `enable_recipe_bom` |
@@ -58,7 +58,7 @@ Shell menampilkan sidebar, header, dan satu halaman di `panelKonten`. Tabel ini 
 | INVENTARIS | Stok Opname | `UcInventaris` (tab opname) | T-22 | Moreno | SA, BM | — |
 | INVENTARIS | Transfer Stok | `UcInventaris` (tab transfer) | T-22 | Moreno | SA, BM | `enable_multi_branch` |
 | INVENTARIS | Riwayat Mutasi | `UcInventaris` (tab mutasi) | T-22 | Moreno | SA, BM | — |
-| LAPORAN & ANALITIK | Laporan | `UcLaporan` | T-16 (shell), T-30/T-32 (data) | Gregorius (shell), Valencia (data & PDF) | SA, BM | — |
+| LAPORAN & ANALITIK | Laporan | `UcLaporan` | T-32 | Valencia | SA, BM | — |
 | LAPORAN & ANALITIK | Dashboard Produk Terlaris | `UcDashboard` | T-33 | Valencia | SA, BM | — |
 | PENGATURAN | Profil Toko | `UcPengaturanToko` | T-18 | Bagas | SA | — |
 | PENGATURAN | Cabang & Pengguna | `UcPengaturanPengguna` | T-18 | Bagas | SA | — |

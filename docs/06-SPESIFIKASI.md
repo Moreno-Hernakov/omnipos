@@ -114,6 +114,7 @@ Aturan:
 - Transaksi, rincian item, dan perubahan stok harus berhasil semua atau batal semua.
 - Hold Bill tidak memotong stok dua kali saat dilunasi.
 - Penjualan jasa tidak memotong stok barang.
+- Pelanggan opsional. Transaksi walk-in tidak memilih pelanggan dan tetap bisa dibayar.
 
 ### 5.4 Inventaris & Stok
 
@@ -127,6 +128,7 @@ Aturan:
 
 - Setiap perubahan stok mencatat jumlah sebelum dan sesudah.
 - Setiap perubahan stok mencatat sumbernya: penjualan, restock, opname, transfer, atau void.
+- Mutasi karena penjualan, hold, dan void dicatat oleh proses transaksi (T-20). Restock, opname, dan transfer dicatat oleh inventaris (T-22). Keduanya memakai tabel dan kolom `stock_movements` yang sama.
 - Stok dipisahkan per cabang.
 - Transfer memiliki status perjalanan dan tidak mengurangi stok dua kali.
 
@@ -142,6 +144,8 @@ Aturan:
 - Satu kasir hanya memiliki satu shift aktif.
 - Tutup shift membandingkan uang sistem dengan uang fisik.
 - Member bersifat opsional; transaksi tetap bisa dilakukan tanpa member.
+- `transactions.customer_id` boleh kosong. Untuk nama tamu atau meja tanpa member, gunakan `label_meja_pelanggan`.
+- Pelanggan nonaktif tidak muncul di pilihan kasir. Pelanggan yang dihapus tidak merusak nota lama karena relasi memakai `ON DELETE SET NULL`.
 - Satu transaksi servis memiliki satu catatan pekerjaan.
 
 ### 5.6 Laporan & Analitik
@@ -191,6 +195,7 @@ Ketentuan umum:
 - Nama file unik agar tidak menimpa laporan sebelumnya.
 - Header memuat identitas toko, judul laporan, periode, dan filter.
 - Total pada laporan harus sama dengan data yang ditampilkan.
+- Transaksi tanpa pelanggan menampilkan `-` atau "Umum" pada kolom pelanggan.
 
 ### 7.2 Dashboard Produk Terlaris
 

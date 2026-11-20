@@ -54,13 +54,13 @@ $msbuild = "C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Curren
 | `src/OmniPos/Forms/OnboardingWizardForm*` | Bagas | Moreno |
 | `src/OmniPos/Controls/UcMasterProduk*`, `UcKategori*` | Rangga | — |
 | `src/OmniPos/Controls/UcBahanBaku*`, `UcResepBOM*` | Rangga | Moreno (HPP) |
-| `src/OmniPos/Controls/UcKasir*` | Gregorius Priyagung | Raymond (logic transaksi) |
+| `src/OmniPos/Controls/UcKasir*` | Raymond | — |
 | `src/OmniPos/Controls/UcInventaris*` | Moreno | Raymond |
-| `src/OmniPos/Controls/UcShift*` | Raymond | Gregorius Priyagung (UI) |
-| `src/OmniPos/Controls/UcServis*` | Gregorius Priyagung | Raymond (status pekerjaan) |
-| `src/OmniPos/Controls/UcLaporan*` | Valencia | Gregorius Priyagung (shell UI) |
+| `src/OmniPos/Controls/UcShift*` | Raymond | — |
+| `src/OmniPos/Controls/UcServis*` | Raymond | — |
+| `src/OmniPos/Controls/UcLaporan*` | Valencia | — |
 | `src/OmniPos/Controls/UcDashboard*` | Valencia | — |
-| `src/OmniPos/Controls/UcPelanggan*` | Gregorius Priyagung | Raymond (integrasi checkout) |
+| `src/OmniPos/Controls/UcPelanggan*`, `Services/PelangganService.cs` | Gregorius Priyagung | Raymond (opsional di kasir) |
 | `src/OmniPos/Controls/UcPengaturanToko*`, `UcPengaturanPengguna*` | Bagas | Moreno |
 | `src/OmniPos/Services/TransactionService.cs` | Raymond | Bagas, Moreno |
 | `src/OmniPos/Services/InventoryService.cs` | Moreno | Raymond |
