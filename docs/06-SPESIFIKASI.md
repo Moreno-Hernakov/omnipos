@@ -73,7 +73,7 @@ Menu yang tidak boleh diakses tidak ditampilkan. Pemeriksaan hak akses tetap dil
 
 - Login dengan username dan password.
 - Akun nonaktif tidak bisa masuk.
-- Onboarding pertama kali: identitas toko, jenis usaha, pajak, dan cabang awal.
+- Onboarding pertama kali: identitas toko, jenis usaha, pajak, dan cabang awal. Empat halaman, field, validasi, dan urutan tulis ada di `07-ALUR-PENGGUNA.md` §2.
 - Menu utama menyesuaikan peran pengguna dan fitur yang diaktifkan.
 - Manajemen cabang dan pengguna.
 
@@ -136,7 +136,7 @@ Aturan:
 
 - Buka dan tutup shift.
 - Rekap uang tunai dan non-tunai.
-- Data pelanggan/member.
+- Data pelanggan/member. Field, batas input, dan posisi pelanggan di kasir ada di `07-ALUR-PENGGUNA.md` §3.
 - Antrean dan status pekerjaan jasa.
 
 Aturan:

@@ -53,7 +53,7 @@ Catatan:
 | ID | Task | Owner | Depends on | Status | Catatan |
 | :--- | :--- | :--- | :--- | :--- | :--- |
 | T-10 | Login pengguna dan validasi hak akses | Moreno | T-03 | Done | `LoginForm` + `AuthService` + `UserRepository` SHA-256; lulus uji login benar, password salah, input kosong, akun nonaktif. Login sudah terhubung ke `MainForm` dan kembali ke form login setelah Keluar |
-| T-11 | Penyiapan awal toko (onboarding) | Bagas | T-03 | Todo | `OnboardingWizardForm` + `app_config`; empat tahap, set `is_onboarded=1`. Bagas penuh: form, service, dan hook sebelum `MainForm` dengan koordinasi Moreno untuk `Program.cs` |
+| T-11 | Penyiapan awal toko (onboarding) | Bagas | T-03 | Todo | `OnboardingWizardForm` + `app_config`; empat halaman, field, validasi, urutan tulis, dan gate login mengikuti `07-ALUR-PENGGUNA.md` §1–2; set `is_onboarded=1` paling akhir. Bagas penuh: form, service, dan hook sebelum `MainForm` dengan koordinasi Moreno untuk `Program.cs` |
 | T-12 | Menu utama dan navigasi sesuai peran | Moreno | T-03 | Done | Dialihkan dari Bagas ke Moreno. `MainForm` shell: sidebar, header, `panelKonten`, role + feature flag dari `app_config`, tombol Keluar. Uji login 3 peran dan logout lulus; halaman modul memakai `UcSegeraHadir` sampai owner menyerahkan `UserControl` |
 | T-13 | Pengelolaan produk dan kategori | Rangga | T-03 | Todo | `UcMasterProduk` + `UcKategori`; CRUD sederhana, validasi kode item. Menu: Produk & Kategori |
 | T-14 | Pengelolaan bahan baku, resep, dan HPP | Rangga | T-13 | Todo | `UcBahanBaku` + `UcResepBOM` + `RecipeService`; HPP = takaran × harga bahan. Menu: Bahan Baku dan Resep & HPP |
