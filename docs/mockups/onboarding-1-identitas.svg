@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="640" viewBox="0 0 900 640" role="img" aria-label="Mockup halaman 1 onboarding: identitas usaha">
+  <rect width="900" height="640" fill="#F8FAFC"/>
+
+  <rect width="900" height="64" fill="#FFFFFF"/>
+  <line x1="0" y1="64" x2="900" y2="64" stroke="#E2E8F0"/>
+  <rect x="24" y="18" width="28" height="28" rx="8" fill="#2563EB"/>
+  <rect x="31" y="29" width="14" height="3" rx="1.5" fill="#FFFFFF"/>
+  <rect x="31" y="35" width="10" height="3" rx="1.5" fill="#FFFFFF"/>
+  <text x="64" y="38" font-family="Segoe UI, Arial, sans-serif" font-size="16" font-weight="600" fill="#1E293B">OmniPOS</text>
+  <text x="146" y="38" font-family="Segoe UI, Arial, sans-serif" font-size="13" fill="#64748B">Penyiapan Awal</text>
+  <path d="M848 24 l12 12 M860 24 l-12 12" stroke="#64748B" stroke-width="1.6" stroke-linecap="round"/>
+
+  <text x="852" y="94" text-anchor="end" font-family="Segoe UI, Arial, sans-serif" font-size="11" fill="#64748B">Langkah 1 dari 4</text>
+
+  <line x1="72" y1="112" x2="288" y2="112" stroke="#E2E8F0" stroke-width="2"/>
+  <line x1="312" y1="112" x2="528" y2="112" stroke="#E2E8F0" stroke-width="2"/>
+  <line x1="552" y1="112" x2="768" y2="112" stroke="#E2E8F0" stroke-width="2"/>
+
+  <circle cx="60" cy="112" r="12" fill="#2563EB"/>
+  <text x="60" y="116" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="12" font-weight="600" fill="#FFFFFF">1</text>
+  <circle cx="300" cy="112" r="12" fill="#FFFFFF" stroke="#CBD5E1"/>
+  <text x="300" y="116" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="12" fill="#64748B">2</text>
+  <circle cx="540" cy="112" r="12" fill="#FFFFFF" stroke="#CBD5E1"/>
+  <text x="540" y="116" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="12" fill="#64748B">3</text>
+  <circle cx="780" cy="112" r="12" fill="#FFFFFF" stroke="#CBD5E1"/>
+  <text x="780" y="116" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="12" fill="#64748B">4</text>
+
+  <text x="60" y="142" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="11" fill="#475569">Identitas usaha</text>
+  <text x="300" y="142" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="11" fill="#64748B">Model bisnis</text>
+  <text x="540" y="142" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="11" fill="#64748B">Mesin &amp; operasional</text>
+  <text x="780" y="142" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="11" fill="#64748B">Cabang &amp; akun</text>
+
+  <rect x="48" y="156" width="804" height="388" rx="12" fill="#FFFFFF" stroke="#E2E8F0"/>
+
+  <text x="80" y="200" font-family="Segoe UI, Arial, sans-serif" font-size="22" font-weight="600" fill="#1E293B">Identitas usaha</text>
+  <text x="820" y="200" text-anchor="end" font-family="Segoe UI, Arial, sans-serif" font-size="11" fill="#64748B">* wajib diisi</text>
+  <text x="80" y="224" font-family="Segoe UI, Arial, sans-serif" font-size="13" fill="#64748B">Data ini dipakai di header, struk, dan laporan.</text>
+
+  <text x="80" y="262" font-family="Segoe UI, Arial, sans-serif" font-size="12" font-weight="600" fill="#475569">Nama usaha *</text>
+  <rect x="80" y="272" width="740" height="42" rx="8" fill="#FFFFFF" stroke="#CBD5E1"/>
+  <text x="96" y="299" font-family="Segoe UI, Arial, sans-serif" font-size="13" fill="#64748B">Contoh: Kopi Senja</text>
+
+  <text x="80" y="336" font-family="Segoe UI, Arial, sans-serif" font-size="12" font-weight="600" fill="#475569">Alamat *</text>
+  <rect x="80" y="346" width="740" height="70" rx="8" fill="#FFFFFF" stroke="#CBD5E1"/>
+  <text x="96" y="371" font-family="Segoe UI, Arial, sans-serif" font-size="13" fill="#64748B">Jl. Ngagel Jaya Tengah No. 73-77, Surabaya</text>
+
+  <text x="80" y="436" font-family="Segoe UI, Arial, sans-serif" font-size="12" font-weight="600" fill="#475569">Telepon *</text>
+  <rect x="80" y="446" width="360" height="42" rx="8" fill="#FFFFFF" stroke="#CBD5E1"/>
+  <text x="96" y="473" font-family="Segoe UI, Arial, sans-serif" font-size="13" fill="#64748B">031-5041500</text>
+  <text x="456" y="473" font-family="Segoe UI, Arial, sans-serif" font-size="11" fill="#64748B">Angka, spasi, +, -, ( )</text>
+
+  <text x="80" y="520" font-family="Segoe UI, Arial, sans-serif" font-size="11" fill="#64748B">Identitas bisa diubah lagi lewat menu Profil Toko setelah onboarding.</text>
+
+  <rect x="80" y="568" width="92" height="40" rx="8" fill="#FFFFFF" stroke="#CBD5E1"/>
+  <text x="126" y="593" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="13" fill="#475569">Batal</text>
+
+  <rect x="580" y="568" width="110" height="40" rx="8" fill="#F1F5F9" stroke="#E2E8F0"/>
+  <text x="635" y="593" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="13" fill="#94A3B8">Kembali</text>
+
+  <rect x="700" y="568" width="120" height="40" rx="8" fill="#2563EB"/>
+  <text x="760" y="593" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="13" font-weight="600" fill="#FFFFFF">Lanjut</text>
+</svg>

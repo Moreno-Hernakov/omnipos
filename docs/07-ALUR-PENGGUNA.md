@@ -45,20 +45,7 @@ Aturan:
 
 Jumlah halaman mengikuti proposal: **empat**, tanpa halaman sambutan terpisah. Satu `OnboardingWizardForm` dengan panel per langkah, indikator "Langkah n dari 4", tombol **Batal**, **Kembali**, dan **Lanjut**/**Selesai**.
 
-```text
-+---------------------------------------------------------------+
-|  OmniPOS — Penyiapan Awal                              [x]    |
-|  Langkah 2 dari 4  [====------]                               |
-+---------------------------------------------------------------+
-|                                                               |
-|  Model bisnis yang dijalankan                                 |
-|  [x] Retail      [ ] F&B      [ ] Jasa                        |
-|                                                               |
-|  Pilih minimal satu. Menu mengikuti pilihan ini.              |
-+---------------------------------------------------------------+
-|  [Batal]                          [Kembali]  [Lanjut]         |
-+---------------------------------------------------------------+
-```
+Mockup wireframe tiap halaman ada di `mockups/`. Ukuran 900×640, font Segoe UI, dan warna mengikuti tema shell di `05-UI-SHELL.md` §6. Ini acuan layout, bukan file Designer final: jarak boleh disesuaikan saat implementasi, field dan urutan tidak.
 
 Aturan global:
 
@@ -70,6 +57,8 @@ Aturan global:
 
 ### Halaman 1 — Identitas Usaha
 
+![Mockup halaman 1: identitas usaha](mockups/onboarding-1-identitas.svg)
+
 | Field | Kunci `app_config` | Wajib | Aturan |
 | :--- | :--- | :---: | :--- |
 | Nama usaha | `business_name` | Ya | 3–100 karakter; dipakai di header, struk, laporan |
@@ -77,6 +66,8 @@ Aturan global:
 | Telepon | `business_phone` | Ya | 6–20 karakter; angka, spasi, `+`, `-`, `(`, `)` |
 
 ### Halaman 2 — Model Bisnis
+
+![Mockup halaman 2: model bisnis](mockups/onboarding-2-model-bisnis.svg)
 
 | Field | Kunci `app_config` | Wajib | Aturan |
 | :--- | :--- | :---: | :--- |
@@ -91,6 +82,8 @@ Aturan global:
 
 ### Halaman 3 — Mesin & Operasional
 
+![Mockup halaman 3: mesin dan operasional](mockups/onboarding-3-operasional.svg)
+
 | Field | Kunci `app_config` | Wajib | Aturan |
 | :--- | :--- | :---: | :--- |
 | Resep & HPP | `enable_recipe_bom` | Tidak | Hanya aktif kalau F&B dicentang; default tercentang saat F&B aktif; dipaksa `0` kalau F&B tidak aktif |
@@ -101,6 +94,8 @@ Aturan global:
 Catatan `enable_multi_branch`: flag ini sudah ada di `06-SPESIFIKASI.md` §9.1 dan dipakai shell, tetapi tidak disebut di tabel empat tahap proposal. Penempatannya di halaman 3 dicatat sebagai keputusan teknis setelah approval, bukan perubahan proposal.
 
 ### Halaman 4 — Cabang & Akun
+
+![Mockup halaman 4: cabang pusat dan akun administrator](mockups/onboarding-4-cabang-akun.svg)
 
 | Field | Tabel | Wajib | Aturan |
 | :--- | :--- | :---: | :--- |
