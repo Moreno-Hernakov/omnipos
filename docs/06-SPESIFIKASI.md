@@ -1,8 +1,8 @@
 # Spesifikasi & Panduan Sistem: Omni-Industry POS Engine
 
-**Versi 3.0 — panduan tim.**
+**Versi 4.0 — panduan tim.**
 
-Dokumen ini menjelaskan cara kerja aplikasi dan aturan bisnis yang perlu diketahui seluruh anggota. Urusan database dan data contoh dikelola terpusat oleh pemilik database; anggota lain tidak perlu menyiapkannya.
+Dokumen ini menjelaskan cara kerja aplikasi dan aturan bisnis yang perlu diketahui seluruh anggota. Cara teknis ada di `04-ARSITEKTUR.md` dan `05-UI-SHELL.md`; status task ada di `02-TASKS.md`. Database dan data contoh dikelola terpusat oleh pemilik database; anggota lain tidak perlu menyiapkannya.
 
 ---
 
@@ -204,15 +204,7 @@ Dashboard menampilkan sepuluh produk terlaris berdasarkan jumlah terjual dan omz
 
 ---
 
-## 8. Pembagian Tugas
-
-Roster anggota, modul formal, bagian yang dikerjakan, dan status task ada di `workspace/TASKS.md`. Satu task satu owner.
-
-Setiap anggota bertanggung jawab menguji fiturnya sendiri sebelum menandai task selesai. Tidak ada task regresi terpusat.
-
----
-
-## 9. Kriteria Selesai
+## 8. Kriteria Selesai
 
 Aplikasi dianggap siap demonstrasi jika:
 
@@ -228,43 +220,11 @@ Aplikasi dianggap siap demonstrasi jika:
 
 ---
 
-## 10. Ketentuan Teknis untuk Developer
+## 9. Lampiran
 
-Bagian ini boleh dilewati pembaca non-teknis.
+### 9.1 Pengaturan Aplikasi
 
-- Aplikasi desktop **Windows Forms**.
-- .NET Framework **4.7.2**, C# **7.3**.
-- Database **MySQL** diakses lewat ADO.NET.
-- Database dan data contoh sudah disiapkan terpusat oleh pemilik database. Anggota lain tidak perlu membuat tabel atau menyiapkan data awal.
-- Struktur aplikasi tiga lapis:
-  - **Tampilan** menangani form dan kontrol.
-  - **Logika bisnis** menangani validasi dan aturan.
-  - **Akses data** menangani komunikasi ke database.
-- Tampilan tidak mengakses database langsung. Logika bisnis tidak menyentuh kontrol form. Akses data tidak menampilkan pesan ke pengguna.
-- Pengambilan data memakai parameter, bukan gabungan teks.
-- Koneksi, perintah, dan pembaca data ditutup setelah dipakai.
-- Perhitungan uang memakai `decimal`.
-
-Alat dan versi:
-
-| Komponen | Versi |
-| :--- | :--- |
-| .NET Framework | 4.7.2 |
-| C# | 7.3 |
-| MySql.Data | 8.4.0 |
-| FastReport.OpenSource | 2026.2.8 |
-| FastReport.OpenSource.Export.PdfSimple | 2026.2.8 |
-| Struk thermal | `PrintDocument` bawaan Windows Forms |
-
-Build memakai MSBuild. Jangan memakai `dotnet restore` untuk project .NET Framework lama.
-
----
-
-## 11. Lampiran Teknis
-
-Bagian ini khusus pengembang dan boleh dilewati.
-
-### 11.1 Pengaturan Aplikasi
+Nilai disimpan di tabel `app_config` dan dibaca oleh `PengaturanService`.
 
 | Pengaturan | Nilai | Efek |
 | :--- | :--- | :--- |
@@ -280,7 +240,7 @@ Bagian ini khusus pengembang dan boleh dilewati.
 | `enable_multi_branch` | `0` / `1` | Mengaktifkan transfer stok dan filter cabang |
 | `tax_percentage` | angka | Tarif pajak default |
 
-### 11.2 Kontrak Data Laporan
+### 9.2 Kontrak Data Laporan
 
 Nama tabel dan kolom data laporan harus konsisten antara pengambilan data, `DataTable`, dan template.
 
@@ -298,20 +258,15 @@ Parameter total:
 - Mutasi stok: `total_masuk`, `total_keluar`.
 - Rekap shift: `total_modal_awal`, `total_uang_sistem`, `total_uang_fisik`, `total_selisih`.
 
-### 11.3 Catatan FastReport
-
-- FastReport OpenSource tidak memiliki desain grafis laporan. Template `.frx` dibuat dari kode.
-- Ekspor PDF memakai `PDFSimpleExport`. Hasilnya berupa gambar per halaman, sehingga teks tidak bisa diselect. Ini batasan paket dan sudah diterima.
-- Panggil `RegisterData` tanpa alias agar tidak bentrok dengan namespace FastReport.
-- Sebelum `Prepare()`, pastikan assembly `Microsoft.CSharp` dan `System.Linq` sudah termuat.
-- Struk thermal tidak memakai FastReport; gunakan `PrintDocument`.
-
 ---
 
-## 12. Referensi
+## 10. Referensi
 
-- Proposal resmi: `docs/PROPOSAL_POS.md`.
-- Skema database: `database/schema_pos.sql`.
-- Papan task dan pembagian anggota: `workspace/TASKS.md`.
-- Aturan kerja: `workspace/CONVENTIONS.md`.
+- Peta dokumen dan urutan baca: `01-README.md`.
+- Pembagian tugas dan status: `02-TASKS.md`.
+- Aturan kerja: `03-CONVENTIONS.md`.
+- Arsitektur dan koneksi: `04-ARSITEKTUR.md`.
+- Shell dan UserControl: `05-UI-SHELL.md`.
+- Skema database: `../database/schema_pos.sql`.
+- Proposal resmi: `proposal/PROPOSAL_POS.md`.
 - Riwayat keputusan: `ctx/uas.md`.

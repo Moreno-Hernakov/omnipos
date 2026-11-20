@@ -1,17 +1,24 @@
 # Papan Task Proyek UAS POS
 
-Status: `Todo`, `Done`.
+Satu task satu owner. Status hanya `Todo` dan `Done`.
 
-Aturan:
+## Aturan Status
 
-- Satu task satu owner.
-- Status hanya `Todo` (belum selesai, termasuk sedang dikerjakan atau terhambat) dan `Done` (build dan uji task selesai).
-- Catat blocker atau dependency yang menunggu di kolom catatan; status tetap `Todo`.
-- Owner memastikan hasil sesuai task, build berhasil, dan skenario utama sudah diuji sebelum menandai `Done`.
-- Setiap anggota menguji fiturnya sendiri. Owner fitur transaksi dan stok juga menguji kasus gagal dan rollback. Tidak ada task regresi terpusat.
-- Judul task ditulis dalam bahasa bisnis agar mudah dibaca dosen dan pemangku kepentingan. Detail teknis tetap ada di kolom catatan, `docs/SPECIFICATION.md` (perilaku), dan `database/schema_pos.sql`.
+- `Todo` — task belum selesai, termasuk yang sedang dikerjakan atau menunggu dependency/koordinasi. Catat blocker di kolom catatan.
+- `Done` — owner sudah memastikan hasil sesuai task, build berhasil, dan skenario utama sudah diuji.
+- Tidak ada status antara. Task yang sedang dikerjakan tetap `Todo`.
+- Satu task hanya boleh punya satu owner. Jika owner berubah, catat di papan ini; owner baru membaca kontrak di `06-SPESIFIKASI.md` dan memakai branch yang sama.
+- Judul task ditulis dalam bahasa bisnis agar mudah dibaca dosen dan pemangku kepentingan. Detail teknis tetap ada di kolom catatan, `06-SPESIFIKASI.md` (perilaku), dan `database/schema_pos.sql`.
 - Dependency adalah penghalang teknis, bukan izin untuk mulai. Pekerjaan boleh dimulai paralel selama skema dan kontrak tersedia; integrasi dicek setelah dependency selesai.
-- Jika owner berubah, catat di papan ini. Owner baru membaca kontrak di `docs/SPECIFICATION.md` dan memakai branch yang sama; jangan membuat implementasi paralel.
+
+## Prinsip Pembagian
+
+- Modul kritikal: checkout, stok, auth, dan laporan PDF dipegang anggota yang mampu menangani integrasi.
+- Task pendukung tetap punya deliverable nyata dan tidak boleh memblokir fitur inti.
+- Task disusun paralel; dependency hanya untuk hal yang benar-benar menghalangi.
+- Setiap anggota menguji fiturnya sendiri; tidak ada task regresi terpusat.
+- Setiap anggota tahu owner task dan siapa yang bisa dimintai bantuan bila perlu.
+- Perubahan arsitektur dicatat di `04-ARSITEKTUR.md`; perubahan status dicatat di file ini; riwayat lintas sesi dicatat di `ctx/uas.md`.
 
 ## Ringkasan per Anggota
 
@@ -29,13 +36,13 @@ Modul formal mengikuti proposal. Kolom bagian menunjukkan pengerjaan aktual tiap
 Catatan:
 
 - Setiap anggota menguji fiturnya sendiri sebelum menandai `Done`.
-- Fase 0, T-10 (login), dan T-12 (shell menu) dikerjakan lebih dulu sebagai contoh alur. Setelah T-03 selesai, pekerjaan modul lain boleh berjalan paralel; halaman modul tinggal dipasang ke shell sesuai peta menu di `CONVENTIONS.md` §4.3.
+- Fase 0, T-10 (login), dan T-12 (shell menu) dikerjakan lebih dulu sebagai contoh alur. Setelah T-03 selesai, pekerjaan modul lain boleh berjalan paralel; halaman modul tinggal dipasang ke shell sesuai peta menu di `05-UI-SHELL.md`.
 
 ## Fase 0 — Fondasi
 
 | ID | Task | Owner | Depends on | Status | Catatan |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| T-00 | Perancangan arsitektur, model data, dan aturan kerja tim | Moreno | — | Done | Fondasi reusable: `docs/SPECIFICATION.md`, `database/schema_pos.sql`, panduan `workspace/` |
+| T-00 | Perancangan arsitektur, model data, dan aturan kerja tim | Moreno | — | Done | Fondasi reusable: `06-SPESIFIKASI.md`, `04-ARSITEKTUR.md`, `database/schema_pos.sql` |
 | T-01 | Penyiapan fondasi aplikasi dan lingkungan pengembangan | Moreno | T-00 | Done | `src/OmniPos.sln` (net472, C# 7.3), paket MySql.Data/FastReport, restore+build MSBuild 0 error |
 | T-02 | Penyiapan data awal dan contoh bisnis | Moreno | T-01 | Done | `database/seed_demo.sql` + `database/README.md`; 16 tabel, 5 akun demo, seed aman dijalankan ulang |
 | T-03 | Koneksi aplikasi ke basis data | Moreno | T-01 | Done | `App.config` + `KoneksiDB`; tes koneksi ke MariaDB 11.4 lulus, kredensial di config bukan di kode |

@@ -15,28 +15,39 @@ Aplikasi desktop **Point of Sales (POS)** modular dan adaptif berbasis **C# Wind
 ---
 
 ## 📁 Struktur Direktori
+
 ```text
 UAS_POS/
 ├── AGENTS.md                  # Aturan wajib untuk agent/developer di scope UAS_POS
-├── README.md                  # Ringkasan proyek & panduan tim
-├── workspace/                 # Aturan kerja, pembagian tugas, dan task board
-│   ├── README.md              # Cara pakai workspace
-│   ├── TASKS.md               # Roster, ownership, dan papan task per fase
-│   └── CONVENTIONS.md         # Branch, commit, cek mandiri, coding, build
-├── docs/                      # Dokumen spesifikasi & naskah laporan
-│   ├── SPECIFICATION.md       # Panduan fitur, alur kerja, dan kriteria selesai
-│   └── PROPOSAL_POS.md        # Proposal yang sudah disetujui
+├── README.md                  # Ringkasan proyek & quick start
+├── docs/                      # Seluruh dokumen kerja, dibaca berurutan
+│   ├── 01-README.md           # Peta dokumen & cara pakai
+│   ├── 02-TASKS.md            # Roster, ownership, task per fase, status
+│   ├── 03-CONVENTIONS.md      # Branch, commit, build, file ownership, DoD
+│   ├── 04-ARSITEKTUR.md       # Stack, 3 lapis, service/repository, koneksi
+│   ├── 05-UI-SHELL.md         # Form vs UserControl, menu, tema
+│   ├── 06-SPESIFIKASI.md      # Perilaku fitur & aturan bisnis
+│   └── proposal/              # Proposal resmi (.md & .docx)
 ├── database/                  # Skrip basis data MySQL
-│   └── schema_pos.sql         # Skrip DDL 16 tabel (13 tabel inti + 3 pendukung)
+│   ├── README.md              # Setup server & akun aplikasi
+│   ├── schema_pos.sql         # DDL 16 tabel
+│   └── seed_demo.sql          # Data contoh
 └── src/                       # Kode sumber C# Windows Forms (.sln & .csproj)
 ```
 
-### Aturan & Pembagian Tugas
+## 🚀 Mulai di Sini
 
-- Baca `AGENTS.md` sebelum mengubah kode.
-- `workspace/TASKS.md` memuat roster, ownership, ringkasan per anggota, dan papan status task. Satu task satu owner.
-- `workspace/CONVENTIONS.md` mengatur branch, commit, cek hasil task, build, dan coding.
-- Panduan fitur ada di `docs/SPECIFICATION.md`; DDL final di `database/schema_pos.sql`.
+1. Baca `AGENTS.md` sebelum mengubah kode.
+2. Ikuti urutan dokumen di `docs/01-README.md`.
+3. Cari task milikmu di `docs/02-TASKS.md`.
+4. Siapkan database lokal mengikuti `database/README.md`.
+
+Aturan penting:
+
+- Satu task satu owner; status hanya `Todo` dan `Done`.
+- Perilaku fitur mengikuti `docs/06-SPESIFIKASI.md`; jangan mengarang aturan sendiri.
+- UI hanya memanggil Service, tidak menulis SQL dan tidak membuka koneksi.
+- Menu dan halaman mengikuti peta di `docs/05-UI-SHELL.md`.
 
 ---
 
