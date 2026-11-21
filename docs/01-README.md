@@ -38,6 +38,8 @@ Riwayat keputusan lintas sesi ada di `ctx/uas.md` (di luar repo).
 5. Uji sendiri skenario utama task sebelum menandai `Done`.
 6. Update status di `02-TASKS.md`, dan catat keputusan di `ctx/uas.md`.
 
+Saat pertama kali menjalankan aplikasi, login memakai akun demo `admin` / `admin123`. Akun peran lain ada di `../database/README.md` bagian **Akun demo**.
+
 Aturan status dan prinsip pembagian ada di `02-TASKS.md`.
 
 ## Aturan Dokumen

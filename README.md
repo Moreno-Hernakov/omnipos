@@ -43,6 +43,7 @@ UAS_POS/
 2. Ikuti urutan dokumen di `docs/01-README.md`.
 3. Cari task milikmu di `docs/02-TASKS.md`.
 4. Siapkan database lokal mengikuti `database/README.md`.
+5. Setelah aplikasi jalan, login dengan akun demo `admin` / `admin123`. Daftar akun lain ada di `database/README.md` bagian **Akun demo**.
 
 Aturan penting:
 

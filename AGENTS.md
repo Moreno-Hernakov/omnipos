@@ -8,14 +8,15 @@ Aturan khusus untuk folder `UAS_POS/`. Aturan global di `AGENTS.md` root workspa
 
 1. `AGENTS.md` root workspace.
 2. `UAS_POS/AGENTS.md` (file ini).
-3. `docs/01-README.md` — peta dokumen.
-4. `docs/06-SPESIFIKASI.md` — kontrak perilaku fitur.
-5. `docs/07-ALUR-PENGGUNA.md` — alur layar, isi field onboarding, field pelanggan, user story.
-6. `docs/08-MOCKUP-HALAMAN.md` — tata letak ASCII setiap layar sebelum membuat Form/UserControl.
-7. `docs/02-TASKS.md` — task, owner, dependency, status.
-8. `docs/04-ARSITEKTUR.md` — sebelum menulis kode.
-9. `docs/05-UI-SHELL.md` — sebelum membuat halaman atau menu.
-10. `ctx/uas.md` — riwayat keputusan sesi sebelumnya.
+3. `docs/01-README.md` — peta dokumen dan cara pakai.
+4. `docs/02-TASKS.md` — task, owner, dependency, status.
+5. `docs/06-SPESIFIKASI.md` — kontrak perilaku fitur.
+6. `docs/07-ALUR-PENGGUNA.md` — alur layar, isi field onboarding, field pelanggan, user story.
+7. `docs/08-MOCKUP-HALAMAN.md` — tata letak ASCII setiap layar sebelum membuat Form/UserControl.
+8. `docs/03-CONVENTIONS.md` — branch, commit, build, ownership, Definition of Done.
+9. `docs/04-ARSITEKTUR.md` — sebelum menulis kode.
+10. `docs/05-UI-SHELL.md` — sebelum membuat halaman atau menu.
+11. `ctx/uas.md` — riwayat keputusan sesi sebelumnya.
 
 Jangan mulai menulis kode sebelum membaca spec dan task yang menjadi tanggung jawabmu.
 
