@@ -390,5 +390,10 @@ namespace OmniPos.Forms
                 Close();
             }
         }
+
+        private void panelKonten_Paint(object sender, PaintEventArgs e)
+        {
+
+        }
     }
 }

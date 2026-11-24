@@ -58,5 +58,10 @@ namespace OmniPos.Controls
 
             return chip;
         }
+
+        private void panelKartu_Paint(object sender, PaintEventArgs e)
+        {
+
+        }
     }
 }

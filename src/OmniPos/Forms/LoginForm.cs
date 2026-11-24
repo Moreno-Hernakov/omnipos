@@ -33,5 +33,10 @@ namespace OmniPos.Forms
             DialogResult = DialogResult.OK;
             Close();
         }
+
+        private void LoginForm_Load(object sender, EventArgs e)
+        {
+
+        }
     }
 }
