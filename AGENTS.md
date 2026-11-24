@@ -17,6 +17,7 @@ Aturan khusus untuk folder `UAS_POS/`. Aturan global di `AGENTS.md` root workspa
 9. `docs/04-ARSITEKTUR.md` — sebelum menulis kode.
 10. `docs/05-UI-SHELL.md` — sebelum membuat halaman atau menu.
 11. `ctx/uas.md` — riwayat keputusan sesi sebelumnya.
+12. `docs/09-GITHUB-MCP.md` — hanya jika perlu mengelola issue/milestone atau memasang tooling GitHub.
 
 Jangan mulai menulis kode sebelum membaca spec dan task yang menjadi tanggung jawabmu.
 
@@ -36,6 +37,7 @@ Jangan mulai menulis kode sebelum membaca spec dan task yang menjadi tanggung ja
 | Shell, menu, UserControl, tema | `docs/05-UI-SHELL.md` |
 | Skema database final | `database/schema_pos.sql` |
 | Riwayat keputusan lintas sesi | `ctx/uas.md` |
+| Pemasangan dan pemakaian GitHub MCP Server | `docs/09-GITHUB-MCP.md` |
 | Proposal yang sudah disetujui | `docs/proposal/PROPOSAL_POS.md` |
 
 Proposal yang sudah disetujui **tidak boleh diubah** tanpa persetujuan tim dan dosen. Perubahan teknis setelah approval dicatat di `docs/06-SPESIFIKASI.md`, bukan dengan mengedit proposal secara diam-diam.
@@ -77,7 +79,7 @@ Detail teknis, alur koneksi, error handling, dan checklist fitur ada di `docs/04
 2. **Owner menangani task sampai selesai.** Cek kesesuaian dengan spec, build, dan skenario utama sebelum menandai `Done`.
 3. **Jangan edit file shared tanpa koordinasi.** File shared: `MainForm.cs`, `KoneksiDB.cs`, `.csproj`, `App.config`, `schema_pos.sql`, `docs/06-SPESIFIKASI.md`.
 4. **Branch sendiri.** Jangan commit langsung ke branch utama. Lihat `docs/03-CONVENTIONS.md`.
-5. **Update task board.** Perbarui `docs/02-TASKS.md` saat task selesai atau catatan blocker/dependency berubah; hanya gunakan `Todo` dan `Done`.
+5. **Update task board.** Perbarui `docs/02-TASKS.md` saat task selesai atau catatan blocker/dependency berubah; status ditandai `✅` (selesai) atau `⬜` (belum). Status asli ada di issue GitHub — jalankan `tools/github-mcp/sync-tasks.ps1` daripada mengedit manual.
 6. **Update konteks.** Setelah keputusan arsitektur atau bug fix, update `ctx/uas.md`.
 7. **Jangan menandai task selesai jika build masih error atau belum diuji.**
 
