@@ -37,6 +37,18 @@ UAS_POS/
 └── src/                       # Kode sumber C# Windows Forms (.sln & .csproj)
 ```
 
+## 🔧 Tooling Repositori
+
+Proyek memakai **GitHub MCP Server** resmi supaya asisten AI bisa membaca repo, mengelola issue, dan membuka pull request langsung dari GitHub.
+
+Pemasangan sekali setelah clone:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File tools\github-mcp\install.ps1
+```
+
+Konfigurasi MCP sudah ada di `.omp/mcp.json`; token diambil otomatis dari environment atau kredensial git, jadi tidak ada token yang di-commit. Panduan lengkap (token, host lain seperti VS Code/Cursor/Claude Code, dan cara membuat milestone) ada di `docs/09-GITHUB-MCP.md`.
+
 ## 🚀 Mulai di Sini
 
 1. Baca `AGENTS.md` sebelum mengubah kode.
@@ -47,7 +59,7 @@ UAS_POS/
 
 Aturan penting:
 
-- Satu task satu owner; status hanya `Todo` dan `Done`.
+- Satu task satu owner; status ditandai `✅` / `⬜`, dan status asli ada di issue GitHub (sinkron lewat `tools/github-mcp/sync-tasks.ps1`).
 - Perilaku fitur mengikuti `docs/06-SPESIFIKASI.md`; jangan mengarang aturan sendiri.
 - UI hanya memanggil Service, tidak menulis SQL dan tidak membuka koneksi.
 - Menu dan halaman mengikuti peta di `docs/05-UI-SHELL.md`.

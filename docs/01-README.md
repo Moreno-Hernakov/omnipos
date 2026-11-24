@@ -12,6 +12,7 @@ Satu folder untuk seluruh dokumen kerja proyek. Kode ada di `../src/`, skrip dat
 6. **`03-CONVENTIONS.md`** — branch, commit, build, ownership, dan Definition of Done.
 7. **`04-ARSITEKTUR.md`** — lapisan aplikasi dan koneksi database. Baca sebelum menyentuh kode.
 8. **`05-UI-SHELL.md`** — shell, menu, dan UserControl. Baca sebelum membuat halaman.
+9. **`09-GITHUB-MCP.md`** — hanya jika perlu memasang tooling GitHub atau mengelola issue/milestone.
 
 Riwayat keputusan lintas sesi ada di `ctx/uas.md` (di luar repo).
 
@@ -27,6 +28,7 @@ Riwayat keputusan lintas sesi ada di `ctx/uas.md` (di luar repo).
 | `06-SPESIFIKASI.md` | Perilaku fitur, aturan bisnis, laporan, kriteria selesai | Sebelum menerima task | Moreno + semua owner modul |
 | `07-ALUR-PENGGUNA.md` | Alur layar, isi field onboarding per halaman, field pelanggan, user story | Sebelum membuat Form/UserControl | Moreno + owner halaman |
 | `08-MOCKUP-HALAMAN.md` | Mockup ASCII per layar, susunan kontrol Windows Forms, keputusan terbuka | Sebelum membuat Form/UserControl | Moreno + owner halaman |
+| `09-GITHUB-MCP.md` | Pemasangan GitHub MCP Server, token, toolset, batasan milestone | Saat memasang tooling repo atau mengelola issue/milestone | Moreno |
 | `proposal/` | Proposal resmi `.md` dan `.docx` | Saat butuh naskah akademik | Tidak boleh diubah tanpa persetujuan |
 
 ## Cara Pakai

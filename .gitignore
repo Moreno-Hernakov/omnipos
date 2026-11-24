@@ -24,3 +24,10 @@ TestResults/
 __pycache__/
 *.pyc
 .superpowers/
+
+# GitHub MCP Server (binary besar, diunduh lewat tools/github-mcp/install.ps1)
+tools/github-mcp/github-mcp-server.exe
+tools/github-mcp/*.zip
+
+# Token GitHub lokal per-mesin, jangan pernah di-commit
+.omp/github-token
